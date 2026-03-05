@@ -1,263 +1,61 @@
-# Projector - Antigravity Architecture
+AI System Prompt: Local-First UDF Architecture
+Core Constraints
+• Tech Stack: Vanilla JavaScript (ESM), `lit-html` (via CDN), IndexedDB.
 
-**Functional, not OOP. Strict UDF. Write-through cache. No build steps.**
+• No Build Steps: Strictly no Webpack, Vite, Babel, TypeScript, or JSX.
 
-See [UI-SPEC.md](UI-SPEC.md) for complete UI design and feature specs.
+• Paradigm: Strict Unidirectional Data Flow (UDF) and functional Entity-Component patterns. No OOP Classes.
 
----
+1. State & Persistence (The Write-Through Cache)
+   • State Segregation:
 
-## Data Flow
+• UI State: Store ONLY ephemeral flags (e.g., `isModalOpen`) and entity pointers (IDs). Never duplicate domain POJOs in the UI state.
 
-```
-Dispatch intent (past-tense: TASK_TOGGLED)
-  ↓ PHASE 1: Sync reducer → nextState + effects
-  ↓ PHASE 2: requestAnimationFrame → render
-  ↓ PHASE 3: queueMicrotask → effects run
-     - Fetch from cache/IDB
-     - Apply domain logic
-     - Persist (auto-dispatches ENTITY_UPDATED)
-  ↓ Cache notifies → smart components re-render
-```
+• Categorized Data: Domain data lives in an in-memory Categorized Write-Through Cache segregated by collections.
 
----
+• Repositories: Access data strictly through domain wrappers (e.g., `Actors.get(id)`, `Items.set(id, entity)`).
 
-## Factories (src/domain/*.js)
+• Cache Sync: The Cache must never call render directly. Upon mutation, it must strictly dispatch an `ENTITY_UPDATED` action through the UDF dispatcher.
 
-```javascript
-export function createTask(id, overrides = {}) {
-  return {
-    id, name: '', projectId: null, completed: false, dueDate: null,
-    parentTaskId: null, createdAt: Date.now(), updatedAt: Date.now(),
-    ...overrides
-  };
-}
+2. Domain Modules (The Recorders)
+   • Responsibility: Act as the "Source of Truth" for data schema and atomic state mutations.
 
-// Pure consequence functions - return new objects
-export function toggleCompletion(task) {
-  return { ...task, completed: !task.completed, updatedAt: Date.now() };
-}
+• Structure: Each domain module (e.g., `actors.js`) must colocate:
 
-export function updateName(task, name) {
-  if (!name?.trim()) throw new Error('Name required');
-  return { ...task, name: name.trim(), updatedAt: Date.now() };
-}
-```
+• Mandatory Factory: `create<Type>(id, overrides)` to enforce the POJO schema and defaults.
 
----
+• Pure Consequence Functions: Atomic "What" functions that operate on specific data components.
 
-## Repositories (src/data/repositories.js)
+• Gatekeeping: Interaction functions must use defensive guard clauses (e.g., `if (!entity?.health) return;`) regardless of factory guarantees.
 
-```javascript
-const cache = { tasks: new Map(), projects: new Map(), ... };
+3. The UDF Dispatcher (Execution Model)
+   State changes follow this synchronous-to-deferred pipeline:
 
-export const Tasks = {
-  async create(data) {
-    const task = createTask(generateId(), data);
-    cache.tasks.set(task.id, task);
-    await db.tasks.put(task);
-    dispatch({ type: 'ENTITY_UPDATED', collection: 'tasks' });
-    return task;
-  },
+1. Synchronous Reducer: Mutation happens immediately via Modular Mutators (no central `rootReducer`). Dispatcher delegates based on action type.
 
-  async get(id) {
-    if (cache.tasks.has(id)) return cache.tasks.get(id);
-    const task = await db.tasks.get(id);
-    if (task) cache.tasks.set(id, task);
-    return task;
-  },
+• Signature: `(state, action) => { state: nextState, effects: [] }`.
 
-  async set(id, task) {
-    cache.tasks.set(id, task);
-    await db.tasks.put(task);
-    dispatch({ type: 'ENTITY_UPDATED', collection: 'tasks' });
-  },
+2. Batched Render: Defer DOM updates using `requestAnimationFrame` to batch synchronous changes.
 
-  async delete(id) {
-    cache.tasks.delete(id);
-    await db.tasks.delete(id);
-    dispatch({ type: 'ENTITY_UPDATED', collection: 'tasks' });
-  }
-};
-```
+3. Deferred Effects: Execute orchestrator logic via `queueMicrotask` to prevent re-entrant dispatch calls.
 
----
+4. Orchestrators (The Rule Processors)
+   • Responsibility: Manage the "When" and "How." Coordinate complex workflows and cross-domain interactions.
 
-## Dispatcher (src/state/dispatcher.js)
+• Logic Hub: Orchestrators are the primary location for "Business Logic" and cross-entity calculations. They fetch entities, perform calculations, and call Domain Consequence functions to apply the results.
 
-```javascript
-export function dispatch(action) {
-  const { nextState, effects } = reduce(action);
-  uiState = nextState;
+• The Write Path: Intent -> Fetch POJOs (via Repositories) -> Process Rules/Calculations -> Execute Domain Mutates -> Repository Save.
 
-  requestAnimationFrame(() => notifySubscribers());
-  effects.forEach(e => queueMicrotask(() => runEffect(e)));
-}
+• DRY Logic: Extract repetitive calculations into shared utility functions rather than forcing them into inappropriate Domain Modules.
 
-function reduce(action) {
-  switch (action.type) {
-    case 'TASK_TOGGLED':
-      return { nextState: uiState, effects: [{ type: 'TOGGLE_TASK_EFFECT', taskId: action.taskId }] };
-    case 'TASK_CREATE_SUBMITTED':
-      return { nextState: { ...uiState, creatingTask: false }, effects: [{ type: 'CREATE_TASK_EFFECT', name: action.name, dueDate: action.dueDate }] };
-    // ...
-    default: return { nextState: uiState, effects: [] };
-  }
-}
+5. Component Architecture
+   • Dumb Components (Presentational): Pure functions returning `lit-html` templates. Consume props, dispatch intents.
 
-async function runEffect(effect) {
-  switch (effect.type) {
-    case 'TOGGLE_TASK_EFFECT': await toggleTaskOrchestrator(effect.taskId); break;
-    case 'CREATE_TASK_EFFECT': await createTaskOrchestrator(effect); break;
-  }
-}
+• Smart Components (Containers): Read pointers from UI state, fetch POJOs from Repositories, and handle fallback rendering (loading/null).
 
-export function getState() { return uiState; }
-export function subscribe(cb) { subscribers.add(cb); return () => subscribers.delete(cb); }
-```
+6. Intent vs. Mutation
+   • Components dispatch Intents (past-tense events: `ATTACK_RESOLVED`).
 
----
+• Mutators update UI state and return Effect Intents.
 
-## Orchestrators (src/orchestration/*.js)
-
-```javascript
-export async function toggleTaskOrchestrator(taskId) {
-  const task = await Tasks.get(taskId);
-  if (!task) return;
-
-  const updated = toggleCompletion(task);
-  await Tasks.set(taskId, updated);
-  // Cache dispatch ENTITY_UPDATED automatically
-}
-
-export async function createTaskOrchestrator(effect) {
-  const projectId = getState().currentProjectId;
-  if (!projectId) return;
-
-  const dueDate = effect.dueDate ? parseSmartDate(effect.dueDate) : null;
-  await Tasks.create({ name: effect.name, projectId, dueDate });
-}
-```
-
----
-
-## Components
-
-**Dumb (presentational):** Pure lit-html functions. Dispatch intents.
-
-```javascript
-export function TaskItem({ task, isEditing, editName, editDueDate, onDelete }) {
-  if (isEditing) {
-    return html`<div class="task-item editing">
-      <input @input=${e => dispatch({ type: 'TASK_EDIT_CHANGE', name: e.target.value, dueDate: editDueDate })} />
-      <button @click=${() => dispatch({ type: 'TASK_EDIT_SAVED', taskId: task.id, name: editName, dueDate: editDueDate })}>✓</button>
-    </div>`;
-  }
-  return html`<div class="task-item">
-    <input type="checkbox" .checked=${task.completed} @change=${() => dispatch({ type: 'TASK_TOGGLED', taskId: task.id })} />
-    <span>${task.name}</span>
-  </div>`;
-}
-```
-
-**Smart (containers):** Read state, fetch data, render dumb components.
-
-```javascript
-export function TaskListContainer(container) {
-  let tasks = [];
-
-  async function loadTasks() {
-    tasks = await Tasks.getByProject(getState().currentProjectId);
-    renderList();
-  }
-
-  function renderList() {
-    const state = getState();
-    const template = html`<section>
-      ${state.creatingTask ? html`<div><input id="task-name" /><button @click=${submit}>✓</button></div>` : html`<div @click=${() => dispatch({ type: 'TASK_CREATE_START' })}>Click to add</div>`}
-      ${tasks.filter(t => !t.completed).map(t => TaskItem({ task: t, ... }))}
-    </section>`;
-    render(template, container);
-  }
-
-  return {
-    onMount() { subscribe(loadTasks); loadTasks(); },
-    onUnmount() { /* unsubscribe */ }
-  };
-}
-```
-
----
-
-## File Structure
-
-```
-src/
-├── domain/
-│   ├── tasks.js (factories + consequence functions)
-│   ├── projects.js
-│   ├── people.js
-│   └── notes.js
-├── data/
-│   ├── db.js (IndexedDB setup)
-│   └── repositories.js (Tasks, Projects, People, Notes)
-├── state/
-│   └── dispatcher.js (UDF dispatch + reducer)
-├── orchestration/
-│   ├── taskOrchestrators.js
-│   ├── projectOrchestrators.js
-│   ├── personOrchestrators.js
-│   └── noteOrchestrators.js
-├── components/
-│   ├── TaskItem.js (dumb)
-│   ├── TaskListContainer.js (smart)
-│   ├── Sidebar.js (smart)
-│   └── ...
-├── pages/
-│   ├── OverviewPage.js (smart container)
-│   └── ProjectPage.js (smart container)
-├── utils/
-│   ├── uuid.js
-│   ├── date.js
-│   └── dom.js
-└── styles/
-```
-
----
-
-## DO's and DON'Ts
-
-✅ Factories + consequence functions (pure, immutable)
-✅ Dispatch intents from components (past-tense: TASK_TOGGLED)
-✅ Orchestrators handle cross-entity logic
-✅ Access data via repositories only
-✅ Guard clauses everywhere
-
-❌ OOP classes
-❌ Store domain data in UI state
-❌ Mutate entities directly
-❌ Call orchestrators from components
-❌ Access IndexedDB directly
-
----
-
-## Entities
-
-**Project:** id, name, description, funded, archived, isPersonal, createdAt, updatedAt
-**Task:** id, name, projectId, completed, dueDate, parentTaskId, createdAt, updatedAt
-**Person:** id, name, role, projectId, createdAt, updatedAt
-**Note:** id, content, link, projectId, createdAt, updatedAt
-
----
-
-## Implementation Order
-
-1. IndexedDB setup + domain modules + repositories + dispatcher
-2. OverviewPage + ProjectPage + Sidebar
-3. Task orchestrators (toggle, create, update, delete)
-4. Project orchestrators (rename, archive, toggle funded)
-5. People + Notes sections
-6. Polish (error handling, loading states)
-
----
-
-**Start small. Each piece testable. Trust the pattern.**
+• Orchestrators process the Effect Intents and manage the persistence transaction.
