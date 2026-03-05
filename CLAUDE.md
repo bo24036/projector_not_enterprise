@@ -1,4 +1,7 @@
 AI System Prompt: Local-First UDF Architecture
+
+**Note:** This architecture is domain-agnostic. Examples below use a project management system (Projects, Tasks, People, Notes), but the same patterns apply to any domain.
+
 Core Constraints
 • Tech Stack: Vanilla JavaScript (ESM), `lit-html` (via CDN), IndexedDB.
 
@@ -13,7 +16,7 @@ Core Constraints
 
 • Categorized Data: Domain data lives in an in-memory Categorized Write-Through Cache segregated by collections.
 
-• Repositories: Access data strictly through domain wrappers (e.g., `Actors.get(id)`, `Items.set(id, entity)`).
+• Repositories: Access data strictly through domain wrappers (e.g., `Projects.get(id)`, `Tasks.set(id, entity)`).
 
 • Cache Sync: The Cache must never call render directly. Upon mutation, it must strictly dispatch an `ENTITY_UPDATED` action through the UDF dispatcher.
 
@@ -26,7 +29,7 @@ Core Constraints
 
 • Pure Consequence Functions: Atomic "What" functions that operate on specific data components.
 
-• Gatekeeping: Interaction functions must use defensive guard clauses (e.g., `if (!entity?.health) return;`) regardless of factory guarantees.
+• Gatekeeping: Interaction functions must use defensive guard clauses (e.g., `if (!task?.projectId) return;`) regardless of factory guarantees.
 
 3. The UDF Dispatcher (Execution Model)
    State changes follow this synchronous-to-deferred pipeline:
@@ -34,6 +37,8 @@ Core Constraints
 1. Synchronous Reducer: Mutation happens immediately via Modular Mutators (no central `rootReducer`). Dispatcher delegates based on action type.
 
 • Signature: `(state, action) => { state: nextState, effects: [] }`.
+
+• Example: Action `TASK_TOGGLED` → Mutator updates UI state → Effect intent queued → Orchestrator fetches task, calls domain mutate, saves to repository.
 
 2. Batched Render: Defer DOM updates using `requestAnimationFrame` to batch synchronous changes.
 
@@ -46,6 +51,8 @@ Core Constraints
 
 • The Write Path: Intent -> Fetch POJOs (via Repositories) -> Process Rules/Calculations -> Execute Domain Mutates -> Repository Save.
 
+• Example: `TASK_CREATE_SUBMITTED` → Fetch project → Create task via factory → Save to Tasks repository → Dispatch `ENTITY_UPDATED`.
+
 • DRY Logic: Extract repetitive calculations into shared utility functions rather than forcing them into inappropriate Domain Modules.
 
 5. Component Architecture
@@ -54,8 +61,16 @@ Core Constraints
 • Smart Components (Containers): Read pointers from UI state, fetch POJOs from Repositories, and handle fallback rendering (loading/null).
 
 6. Intent vs. Mutation
-   • Components dispatch Intents (past-tense events: `ATTACK_RESOLVED`).
+   • Components dispatch Intents (past-tense events: `TASK_TOGGLED`, `PROJECT_CREATED`).
 
 • Mutators update UI state and return Effect Intents.
 
 • Orchestrators process the Effect Intents and manage the persistence transaction.
+
+## Implementation Contracts
+
+See **UI-SPEC.md** for the concrete specification: component inventory, state shape, data models, page layouts, and key interactions for this project.
+
+## Development Process
+
+See **WORKFLOW.md** for commit practices, code organization, and team workflows.
