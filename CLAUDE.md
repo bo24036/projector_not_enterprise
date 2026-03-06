@@ -1,71 +1,134 @@
-AI System Prompt: Local-First UDF Architecture
+Standard Development Rules: Local-First UDF Edition
 
-**Note:** This architecture is domain-agnostic. Examples below use a project management system (Projects, Tasks, People, Notes), but the same patterns apply to any domain.
+    [!IMPORTANT]
+    CRITICAL ARCHITECTURAL BOUNDARIES
 
-Core Constraints
-• Tech Stack: Vanilla JavaScript (ESM), `lit-html` (via CDN), IndexedDB.
+        NO CLASSES / NO OOP: No class, this, or new. Use POJOs and exported functions.
 
-• No Build Steps: Strictly no Webpack, Vite, Babel, TypeScript, or JSX.
+        NO BUILD STEP / ESM ONLY: All imports must use the .js extension (e.g., import { x } from './file.js').
 
-• Paradigm: Strict Unidirectional Data Flow (UDF) and functional Entity-Component patterns. No OOP Classes.
+        VANILLA LIT-HTML: Use html tagged templates via CDN.
 
-1. State & Persistence (The Write-Through Cache)
-   • State Segregation:
+        LIBRARY PHILOSOPHY: CDN-ready only. Approved: workbox (Service Workers) and idb (IndexedDB).
 
-• UI State: Store ONLY ephemeral flags (e.g., `isModalOpen`) and entity pointers (IDs). Never duplicate domain POJOs in the UI state.
+        ZERO DOMAIN COUPLING: A Domain module must never import another Domain module.
 
-• Categorized Data: Domain data lives in an in-memory Categorized Write-Through Cache segregated by collections.
+1.  Project Management & Git
 
-• Repositories: Access data strictly through domain wrappers (e.g., `Projects.get(id)`, `Tasks.set(id, entity)`).
+    Persistent Todo List: Maintain docs/todo.md. Mark items done; never delete to preserve history.
 
-• Cache Sync: The Cache must never call render directly. Upon mutation, it must strictly dispatch an `ENTITY_UPDATED` action through the UDF dispatcher.
+    Git Workflows: Small, logical chunks with descriptive conventional commit messages.
 
-2. Domain Modules (The Recorders)
-   • Responsibility: Act as the "Source of Truth" for data schema and atomic state mutations.
+    ADRs: Document any tradeoff made against these rules, especially regarding new library additions.
 
-• Structure: Each domain module (e.g., `actors.js`) must colocate:
+2.  Core Architectural Constraints
 
-• Mandatory Factory: `create<Type>(id, overrides)` to enforce the POJO schema and defaults.
+    Strict No-OOP: Data = POJOs. Logic = Stateless functions.
 
-• Pure Consequence Functions: Atomic "What" functions that operate on specific data components.
+    Reference by ID: Objects reference each other via IDs, never direct memory pointers.
 
-• Gatekeeping: Interaction functions must use defensive guard clauses (e.g., `if (!task?.projectId) return;`) regardless of factory guarantees.
+    Testing: Prioritize unit tests for Pure Consequence Functions and Rule Processors.
 
-3. The UDF Dispatcher (Execution Model)
-   State changes follow this synchronous-to-deferred pipeline:
+3.  Data Layer & Persistence
 
-1. Synchronous Reducer: Mutation happens immediately via Modular Mutators (no central `rootReducer`). Dispatcher delegates based on action type.
+    Write-Through Cache: Categorized in-memory cache backed by IndexedDB (via idb).
 
-• Signature: `(state, action) => { state: nextState, effects: [] }`.
+    State Segregation:
 
-• Example: Action `TASK_TOGGLED` → Mutator updates UI state → Effect intent queued → Orchestrator fetches task, calls domain mutate, saves to repository.
+        UI State: Ephemeral flags (e.g., activeTab) and entity IDs only.
 
-2. Batched Render: Defer DOM updates using `requestAnimationFrame` to batch synchronous changes.
+        Canonical Data: Domain POJOs live only in the Cache. Never duplicate in UI state.
 
-3. Deferred Effects: Execute orchestrator logic via `queueMicrotask` to prevent re-entrant dispatch calls.
+4.  Domain Modules (The Nouns)
 
-4. Orchestrators (The Rule Processors)
-   • Responsibility: Manage the "When" and "How." Coordinate complex workflows and cross-domain interactions.
+    Responsibility: Schema (Factories) and atomic mutations.
 
-• Logic Hub: Orchestrators are the primary location for "Business Logic" and cross-entity calculations. They fetch entities, perform calculations, and call Domain Consequence functions to apply the results.
+    Mandatory Factory: Must export a factory (e.g., createActor(id, overrides)) defining mandatory schema and default values.
 
-• The Write Path: Intent -> Fetch POJOs (via Repositories) -> Process Rules/Calculations -> Execute Domain Mutates -> Repository Save.
+    Isolation: Strictly forbidden to import other domains.
 
-• Example: `TASK_CREATE_SUBMITTED` → Fetch project → Create task via factory → Save to Tasks repository → Dispatch `ENTITY_UPDATED`.
+    Domain Selectors: Functions for single-entity calculations live here.
 
-• DRY Logic: Extract repetitive calculations into shared utility functions rather than forcing them into inappropriate Domain Modules.
+    Gatekeeping: Use defensive guard clauses (e.g., if (!entity?.health) return;) regardless of factory guarantees.
 
-5. Component Architecture
-   • Dumb Components (Presentational): Pure functions returning `lit-html` templates. Consume props, dispatch intents.
+5.  The UDF Dispatcher Pipeline
 
-• Smart Components (Containers): Read pointers from UI state, fetch POJOs from Repositories, and handle fallback rendering (loading/null).
+State changes follow a synchronous-to-deferred pipeline to prevent re-entrancy:
 
-6. Intent vs. Mutation
-   • Components dispatch Intents (past-tense events: `TASK_TOGGLED`, `PROJECT_CREATED`).
+    Synchronous Reducer: Mutation via Modular Mutators (No central root reducer).
 
-• Mutators update UI state and return Effect Intents.
+        Signature: (state, action) => { state: nextState, effects: [] }.
 
-• Orchestrators process the Effect Intents and manage the persistence transaction.
+    Batched Render: Defer DOM updates using requestAnimationFrame.
+
+    Effect Execution: Trigger effects[] via queueMicrotask.
+
+        Rule: All effects (e.g., API calls, IDB writes) must re-enter the loop by dispatching a new action upon completion.
+
+6.  Orchestrators, Services, & Selection Logic
+
+    Orchestrators: The only layer allowed to "couple" domains. They coordinate multi-domain workflows and rules.
+
+    Cross-Domain Selectors: Pure functions that "join" data from multiple domains. Place in js/orchestrators/.
+
+    Services (I/O): Asynchronous wrappers for fetch, idb, and workbox.
+
+7.  UI & CSS Mechanics
+    Component Architecture
+
+        Dumb Components: lit-html templates.
+
+            Rule: ZERO logic, math, or string manipulation. (No rounding, formatting, or filtering).
+
+            Constraint: No this. Event handlers are standalone functions that dispatch Intents.
+
+        Smart Components: Containers that call Selectors and pass formatted results to Dumb Components.
+
+            Ghost Layout: Must explicitly render a fragment/skeleton if data is missing to prevent layout collapse.
+
+        Skeletons (Visual Tombstones): Render placeholder fragments for all async/loading states.
+
+Styling & Layout
+
+    Box Model: box-sizing: border-box locked globally.
+
+    Layout: CSS Grid (2D), Flexbox (1D). Use subgrid for alignment.
+
+    Scoped CSS: Prefix all classes with the component name (e.g., .actor-card__label).
+
+    Dynamic Styling:
+
+        Use Class Toggling for boolean states (e.g., .is-active).
+
+        Use Inline CSS Variables for continuous values (e.g., style="--progress: 60%"). Do not manipulate .style.width via JS.
+
+    Ban List: No !important, display: contents, or position: absolute (except overlays/modals).
+
+8. File & Folder Structure
+
+   js/domains/: Isolated factories, mutations, and Domain Selectors.
+
+   js/orchestrators/: Coordination logic and Cross-Domain Selectors.
+
+   js/services/: Async I/O (Workbox, idb, fetch).
+
+   js/ui/mutators/: Modular UI state reducers.
+
+   js/ui/components/: Rendering logic (Smart/Dumb pairs).
+
+Definition of Done (Checklist for AI)
+
+    [ ] No class or this keywords.
+
+    [ ] All imports use the .js extension.
+
+    [ ] Library Check: Service Workers use Workbox; IndexedDB uses idb.
+
+    [ ] Domain Isolation: Does this domain import another domain? (If yes, move logic to Orchestrator).
+
+    [ ] Logic-Free UI: Are math/string operations in a Selector instead of the component?
+
+    [ ] CSS Guardrails: Are classes scoped with prefixes? Are skeletons/ghost layouts implemented?
 
 ## Implementation Contracts
 
