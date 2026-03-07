@@ -45,7 +45,10 @@
 - Cohesion: Domain modules own the coordination of their specific logic and its immediate write-through persistence. They do not rely on state handlers or effects to "remember" to save.
 - Mandatory Factory: Must export a factory (e.g., createActor(id, overrides)) defining mandatory schema and default values.
 - Isolation: Strictly forbidden to import other domains.
-- Domain Queries: Functions for single-entity calculations live here.
+- Domain Queries: Pure functions for single-entity derived calculations. Signature: `(entity) => value`.
+  - Use Domain Queries when: Calculation is reused across multiple connectors or components.
+  - Use Local Code in Connector when: Calculation is one-off formatting for a single component.
+  - Module Layout: Exports alongside factories and change functions. Import in connectors via `import { queryFunction } from '../domains/EntityType.js'`.
 - Gatekeeping: Use defensive guard clauses (e.g., if (!entity?.health) return;) regardless of factory guarantees.
 
 ## The UDF Dispatcher Pipeline
