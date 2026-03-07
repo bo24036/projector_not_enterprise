@@ -28,8 +28,12 @@
 ## Domain Modules (The Nouns)
 
 - Responsibility: Schema (Factories), persistence, and atomic changes to pojo data.
-- Cache Miss (The "Unknown"): If get(id) is a miss, it returns undefined and the domain get function silently triggers an async fetch from the Service layer.
-- The Fulfillment Dispatch: When an async fetch completes and populates the cache, it MUST dispatch an action to trigger a re-render from Skeleton to Entity.
+- Cache Miss (The "Unknown"): If get(id) is a miss, it SYNCHRONOUSLY returns undefined and simultaneously queues an async fetch (side effect). The get() function itself NEVER awaits or returns a promise. Render uses this synchronous result immediately.
+- Two-Step Render Process: Component calls domain.get(id) → receives undefined synchronously → renders skeleton. Meanwhile, async fetch completes in background → dispatches fulfillment action → component re-renders with entity.
+- CRITICAL: domain.get(id) is ALWAYS synchronous.
+  - ✅ DO: `const entity = Projects.get(id); return skeleton if !entity else entity;`
+  - ❌ DON'T: `await Projects.get(id)` or return promises.
+- The Fulfillment Dispatch: When the queued async fetch completes and populates the cache, it MUST dispatch a fulfillment action (e.g., ENTITY_LOADED) to trigger a re-render. Component automatically picks up fresh entity from cache on next render.
 - Synchronous Source of Truth: The in-memory Cache is the primary source of truth. All reads and changes are synchronous.
 - Persistence Guarantee (Write-Through): Every change function (e.g., archiveEntity(id)) is a Gatekeeper. It must:
   - Update the in-memory Cache synchronously. UI reflects this immediately.
