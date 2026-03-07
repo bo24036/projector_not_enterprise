@@ -108,7 +108,8 @@ State changes follow a synchronous-to-deferred pipeline to prevent re-entrancy:
 - Dynamic Styling:
   - Use Class Toggling for boolean states (e.g., .is-active).
   - Use Inline CSS Variables for continuous values (e.g., style="--progress: 60%"). Do not manipulate .style.width via JS.
-- Ban List: No !important, display: contents, or position: absolute (except overlays/modals).
+- Ban List: No !important, display: contents, or position: absolute.
+  - Exception: Only with explicit user approval. Before using position: absolute to solve a layout problem, describe the use case and ask for confirmation.
 
 ## File & Folder Structure
 
