@@ -18,7 +18,13 @@
 
 - Strict No-OOP: Data = POJOs. Logic = Stateless functions.
 - Reference by ID: Objects reference each other via IDs, never direct memory pointers.
-- Testing: Prioritize unit tests for Pure Consequence Functions and Rule Processors.
+- Testing Strategy:
+  - Domains (Factories, Queries, Change Functions): Fully testable (pure, synchronous). Test schema, edge cases, mutations, and persistence queue triggers.
+  - Handlers: Fully testable (mocked state, mocked domains). Assert state mutations and effect generation.
+  - Effects: Testable (mocked async operations). Assert fulfillment dispatch.
+  - Connectors: Partially testable. Extract reusable formatting to Domain Queries. Test complex data selection or conditional logic; simple selections are usually verified visually.
+  - Dumb Components: Optional (pure templates, no logic).
+  - File Structure: Tests live alongside source. Naming: `EntityType.test.js`.
 
 ## Data Layer & Persistence
 
