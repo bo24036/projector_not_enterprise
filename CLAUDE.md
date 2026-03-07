@@ -127,6 +127,9 @@ This app operates fully offline with no backend. Service Worker caching and Inde
 - **Source of Truth:** IndexedDB holds canonical data (projects, tasks, people, notes).
 - **In-Memory Cache:** Write-through synced with IDB. Domain.get() reads from cache; mutations update cache synchronously and trigger background IDB writes.
 - **Service Worker Cache:** Caches JS/CSS for offline access and performance. NOT a source of truth—purely a performance layer.
+- **Cache Strategy (NetworkFirst):** Attempt to fetch from network (dev server) first. If network is unavailable or times out, fall back to cached version.
+  - Dev: Network wins. Ensures fresh code on every reload during development.
+  - Production/Offline: Cache wins. App works without network; stale code serves until user navigates and network reconnects.
 - **Cache Invalidation:** When you modify service-worker.js or change JS/CSS structure, increment `SW_VERSION` in main.js. This forces fresh code download on next page load.
   - Why: Browser cache key includes version. Bumping version = new cache bucket = fresh files downloaded.
   - When: Any change to service-worker.js, significant JS refactoring, new CSS files, breaking data format changes.
