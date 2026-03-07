@@ -46,7 +46,7 @@
   - Trigger a fire-and-forget Serialized Background Save to IndexedDB. If write succeeds, no dispatch is needed (state is already in cache). If write fails:
     - Log error to console for debugging.
     - For critical operations (explicit deletions, user-initiated saves): Dispatch error action to notify user and offer recovery (retry, undo, etc.).
-    - For routine mutations (inline edits): Silent failure is acceptable. Cache remains valid; data persists on next successful write or user refresh.
+    - For routine mutations (inline edits): Silent failure is acceptable. Cache remains valid; data persists on next successful write or user refresh. UI doesn't need to interrupt user but some subtle, non-invasive visual indicator that changes aren't saving should be included.
   - Serialized Persistence (The Guard): Domains must treat IDB writes as Sequential Effects.
     - Writes to the same collection/ID must be queued and executed in order.
     - Debouncing Writes: If multiple mutations happen to the same ID in rapid succession, the Domain should only persist the final state to IDB once the previous write transaction is complete.
