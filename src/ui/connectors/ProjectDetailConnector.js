@@ -1,65 +1,47 @@
 import { html, render } from 'https://unpkg.com/lit-html@2/lit-html.js';
 import { ProjectDetail } from '../components/ProjectDetail.js';
 import * as Project from '../../domains/Project.js';
-import { dispatch, watch } from '../../state.js';
+import { dispatch } from '../../state.js';
 import { navigateToList } from '../../utils/router.js';
 
-export function initProjectDetailConnector(containerSelector) {
+export function initProjectDetailConnector(containerSelector, state) {
   const container = document.querySelector(containerSelector);
   if (!container) return;
 
-  let currentProjectId = null;
-  let unsubscribeState = null;
+  const project = state.currentProjectId ? Project.getProject(state.currentProjectId) : null;
 
-  function renderDetail() {
-    const project = currentProjectId ? Project.getProject(currentProjectId) : null;
-
-    if (!project) {
-      const template = html`
-        <div class="project-detail-empty">
-          <p>Select a project from the sidebar to view its details.</p>
-        </div>
-      `;
-      render(template, container);
-      return;
-    }
-
+  if (!project) {
     const template = html`
-      <div class="project-detail-container">
-        ${ProjectDetail({
-          project,
-          onNameChange: (newName) => {
-            if (newName.trim() && newName !== project.name) {
-              dispatch({ type: 'RENAME_PROJECT', payload: { projectId: project.id, newName } });
-            }
-          },
-          onDescriptionChange: (description) => {
-            dispatch({
-              type: 'UPDATE_DESCRIPTION',
-              payload: { projectId: project.id, description },
-            });
-          },
-          onDelete: () => {
-            dispatch({ type: 'DELETE_PROJECT', payload: { projectId: project.id } });
-            navigateToList();
-          },
-        })}
+      <div class="project-detail-empty">
+        <p>Select a project from the sidebar to view its details.</p>
       </div>
     `;
-
     render(template, container);
+    return;
   }
 
-  unsubscribeState = watch('currentProjectId', (newId) => {
-    currentProjectId = newId;
-    renderDetail();
-  });
+  const template = html`
+    <div class="project-detail-container">
+      ${ProjectDetail({
+        project,
+        onNameChange: (newName) => {
+          if (newName.trim() && newName !== project.name) {
+            dispatch({ type: 'RENAME_PROJECT', payload: { projectId: project.id, newName } });
+          }
+        },
+        onDescriptionChange: (description) => {
+          dispatch({
+            type: 'UPDATE_DESCRIPTION',
+            payload: { projectId: project.id, description },
+          });
+        },
+        onDelete: () => {
+          dispatch({ type: 'DELETE_PROJECT', payload: { projectId: project.id } });
+          navigateToList();
+        },
+      })}
+    </div>
+  `;
 
-  renderDetail();
-
-  return {
-    destroy: () => {
-      if (unsubscribeState) unsubscribeState();
-    },
-  };
+  render(template, container);
 }

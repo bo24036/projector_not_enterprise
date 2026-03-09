@@ -2,14 +2,23 @@ import './handlers/ProjectHandler.js';
 import { initSidebarConnector } from './ui/connectors/SidebarConnector.js';
 import { initProjectDetailConnector } from './ui/connectors/ProjectDetailConnector.js';
 import { initRouter } from './utils/router.js';
+import { getState, setRootRenderer } from './state.js';
+
+function renderApp() {
+  const state = getState();
+  initSidebarConnector('#sidebar', state);
+  initProjectDetailConnector('#main-content', state);
+}
 
 function initApp() {
-  // Initialize router first so it can dispatch initial navigation
+  // Register root renderer before router init so initial navigation triggers render
+  setRootRenderer(renderApp);
+
+  // Initialize router - this will dispatch initial navigation action
   initRouter();
 
-  // Initialize connectors
-  initSidebarConnector('#sidebar');
-  initProjectDetailConnector('#main-content');
+  // Render initial state
+  renderApp();
 }
 
 // Wait for DOM to be ready

@@ -3,9 +3,17 @@ const state = {
   isCreatingProject: false,
 };
 
-const watchers = new Map();
 let renderScheduled = false;
 let pendingStateUpdates = {};
+let rootRenderer = null;
+
+export function getState() {
+  return state;
+}
+
+export function setRootRenderer(fn) {
+  rootRenderer = fn;
+}
 
 function setState(updates) {
   // Collect updates without applying yet
@@ -24,26 +32,11 @@ function setState(updates) {
     pendingStateUpdates = {};
     renderScheduled = false;
 
-    // Notify watchers after all updates applied
-    notifyWatchers();
+    // Call root renderer after state is updated
+    if (rootRenderer) {
+      rootRenderer();
+    }
   });
-}
-
-export function watch(key, callback) {
-  if (!watchers.has(key)) {
-    watchers.set(key, new Set());
-  }
-  watchers.get(key).add(callback);
-
-  return () => {
-    watchers.get(key).delete(callback);
-  };
-}
-
-function notifyWatchers() {
-  for (const [key, callbacks] of watchers.entries()) {
-    callbacks.forEach(callback => callback(state[key]));
-  }
 }
 
 export function dispatch(action) {

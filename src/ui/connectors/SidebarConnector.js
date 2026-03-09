@@ -3,55 +3,48 @@ import { ProjectListItem } from '../components/ProjectListItem.js';
 import { ProjectNewItem } from '../components/ProjectNewItem.js';
 import { ProjectInput } from '../components/ProjectInput.js';
 import * as Project from '../../domains/Project.js';
-import { dispatch, watch } from '../../state.js';
+import { dispatch } from '../../state.js';
 import { navigateToProject } from '../../utils/router.js';
 
-export function initSidebarConnector(containerSelector) {
+export function initSidebarConnector(containerSelector, state) {
   const container = document.querySelector(containerSelector);
   if (!container) return;
 
-  let currentProjectId = null;
-  let isCreatingProject = false;
-  let unsubscribeCurrentProjectId = null;
-  let unsubscribeIsCreating = null;
+  const projects = Project.getAllProjects();
 
-  function renderSidebar() {
-    const projects = Project.getAllProjects();
+  const projectsHtml = projects.map(project =>
+    ProjectListItem({
+      project,
+      isSelected: state.currentProjectId === project.id,
+      onSelect: () => navigateToProject(project.id),
+    })
+  );
 
-    const projectsHtml = projects.map(project =>
-      ProjectListItem({
-        project,
-        isSelected: currentProjectId === project.id,
-        onSelect: () => navigateToProject(project.id),
+  // Add the new project item as the last entry in the list
+  const newProjectItem = state.isCreatingProject
+    ? ProjectInput({
+        onSave: handleSave,
+        onCancel: () => dispatch({ type: 'CANCEL_CREATE_PROJECT' }),
       })
-    );
+    : ProjectNewItem({
+        onStartCreate: () => dispatch({ type: 'START_CREATE_PROJECT' }),
+      });
 
-    // Add the new project item as the last entry in the list
-    const newProjectItem = isCreatingProject
-      ? ProjectInput({
-          onSave: handleSave,
-          onCancel: () => dispatch({ type: 'CANCEL_CREATE_PROJECT' }),
-        })
-      : ProjectNewItem({
-          onStartCreate: () => dispatch({ type: 'START_CREATE_PROJECT' }),
-        });
+  const listItems = [...projectsHtml, newProjectItem];
 
-    const listItems = [...projectsHtml, newProjectItem];
-
-    const template = html`
-      <div class="sidebar">
-        <div class="sidebar__header">
-          <h1 class="sidebar__title">Projects</h1>
-        </div>
-
-        <div class="sidebar__list">
-          ${listItems}
-        </div>
+  const template = html`
+    <div class="sidebar">
+      <div class="sidebar__header">
+        <h1 class="sidebar__title">Projects</h1>
       </div>
-    `;
 
-    render(template, container);
-  }
+      <div class="sidebar__list">
+        ${listItems}
+      </div>
+    </div>
+  `;
+
+  render(template, container);
 
   function handleSave(name) {
     const projects = Project.getAllProjects();
@@ -62,23 +55,4 @@ export function initSidebarConnector(containerSelector) {
 
     dispatch({ type: 'CREATE_PROJECT', payload: { name } });
   }
-
-  unsubscribeCurrentProjectId = watch('currentProjectId', (newId) => {
-    currentProjectId = newId;
-    renderSidebar();
-  });
-
-  unsubscribeIsCreating = watch('isCreatingProject', (isCreating) => {
-    isCreatingProject = isCreating;
-    renderSidebar();
-  });
-
-  renderSidebar();
-
-  return {
-    destroy: () => {
-      if (unsubscribeCurrentProjectId) unsubscribeCurrentProjectId();
-      if (unsubscribeIsCreating) unsubscribeIsCreating();
-    },
-  };
 }
