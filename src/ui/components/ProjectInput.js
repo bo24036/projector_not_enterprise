@@ -1,5 +1,4 @@
 import { html } from 'https://unpkg.com/lit-html@2/lit-html.js';
-import { ref } from 'https://unpkg.com/lit-html@2/directives/ref.js';
 
 export function ProjectInput({ onSave, onCancel }) {
   let inputValue = '';
@@ -27,7 +26,7 @@ export function ProjectInput({ onSave, onCancel }) {
   return html`
     <div class="project-list-item project-list-item--editing">
       <input
-        ${ref(el => el?.focus())}
+        autofocus
         class="project-input__field"
         type="text"
         placeholder="New project name..."
