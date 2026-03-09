@@ -108,6 +108,7 @@
   display: flex;
   gap: var(--spacing-2xs);
   flex-shrink: 0;
+  padding-left: var(--spacing-sm);
   padding-right: var(--spacing-md);
 }
 
