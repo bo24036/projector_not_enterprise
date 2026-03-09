@@ -24,9 +24,6 @@ export function ProjectDetail({ project, onNameChange, onDescriptionChange, onDe
           value=${project.name}
           @change=${handleNameChange}
         />
-      </div>
-
-      <div class="project-detail__controls">
         <button class="project-detail__delete-button" @click=${handleDelete}>
           Delete
         </button>

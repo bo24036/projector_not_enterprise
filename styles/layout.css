@@ -164,7 +164,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
-  max-width: 600px;
+  width: 100%;
 }
 
 .project-detail__header {
@@ -174,12 +174,12 @@
 }
 
 .project-detail__name {
+  flex: 1;
   font-size: var(--font-size-2xl);
   font-weight: var(--font-weight-bold);
   border: var(--border-width) solid transparent;
   border-radius: var(--border-radius-md);
   padding: var(--spacing-sm) var(--spacing-md);
-  flex: 1;
 }
 
 .project-detail__name:hover,
@@ -188,18 +188,15 @@
   border-color: var(--color-border);
 }
 
-.project-detail__controls {
-  display: flex;
-  gap: var(--spacing-md);
-}
-
 .project-detail__delete-button {
+  flex-shrink: 0;
   padding: var(--spacing-sm) var(--spacing-lg);
   background-color: var(--color-error);
   color: var(--color-text-light);
   border-radius: var(--border-radius-md);
   font-weight: var(--font-weight-medium);
   transition: background-color var(--transition-fast);
+  white-space: nowrap;
 }
 
 .project-detail__delete-button:hover {
@@ -210,6 +207,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
+  width: 100%;
 }
 
 .project-detail__label {
@@ -221,6 +219,7 @@
 }
 
 .project-detail__description {
+  width: 100%;
   padding: var(--spacing-md);
   border: var(--border-width) solid var(--color-border);
   border-radius: var(--border-radius-md);
