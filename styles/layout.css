@@ -177,15 +177,29 @@
   flex: 1;
   font-size: var(--font-size-2xl);
   font-weight: var(--font-weight-bold);
-  border: var(--border-width) solid transparent;
-  border-radius: var(--border-radius-md);
-  padding: var(--spacing-sm) var(--spacing-md);
+  color: var(--color-text);
+
+  /* Heading appearance by default */
+  border: none;
+  background-color: transparent;
+  padding: var(--spacing-sm) 0;
+
+  /* Subtle hover cue: transparent bottom border that appears on hover */
+  border-bottom: 2px solid transparent;
+  transition: all var(--transition-fast);
+  cursor: text;
 }
 
-.project-detail__name:hover,
+.project-detail__name:hover {
+  border-bottom-color: var(--color-text-secondary);
+}
+
 .project-detail__name:focus {
+  outline: none;
   background-color: var(--color-surface);
-  border-color: var(--color-border);
+  border-bottom-color: var(--color-primary);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius-md);
 }
 
 .project-detail__delete-button {
