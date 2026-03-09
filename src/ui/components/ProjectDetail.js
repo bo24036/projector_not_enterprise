@@ -1,6 +1,8 @@
 import { html } from 'https://unpkg.com/lit-html@2/lit-html.js';
 
 export function ProjectDetail({ project, onNameChange, onDescriptionChange, onDelete }) {
+  if (!project) return html``;
+
   function handleNameChange(event) {
     onNameChange(event.target.value);
   }

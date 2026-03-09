@@ -2,9 +2,22 @@ const projectCache = new Map();
 let nextId = 1;
 
 export function createProject(overrides = {}) {
+  const name = overrides.name || '';
+
+  if (!name.trim()) {
+    throw new Error('Project name cannot be empty');
+  }
+
+  const trimmedName = name.trim();
+  const allProjects = getAllProjects();
+
+  if (allProjects.some(p => p.name === trimmedName)) {
+    throw new Error('Project name already exists');
+  }
+
   const project = {
     id: nextId++,
-    name: overrides.name || '',
+    name: trimmedName,
     description: overrides.description || '',
     createdAt: overrides.createdAt || new Date().toISOString(),
   };
@@ -60,4 +73,10 @@ export function deleteProject(id) {
 
   projectCache.delete(id);
   return true;
+}
+
+// Test utility - clears cache and resets ID counter
+export function _resetCacheForTesting() {
+  projectCache.clear();
+  nextId = 1;
 }

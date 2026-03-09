@@ -21,6 +21,7 @@ function describe(suiteName, fn) {
 
 function it(testName, fn) {
   try {
+    Project._resetCacheForTesting();
     fn();
   } catch (error) {
     console.error(`❌ FAILED: ${testName}`);
@@ -29,10 +30,9 @@ function it(testName, fn) {
   }
 }
 
-// Clear cache before each test
+// Reset cache before each test suite
 function beforeEach() {
-  // Reset the cache by creating new projects
-  // We can't directly reset the cache, so we'll work with it as is
+  Project._resetCacheForTesting();
 }
 
 // Tests
@@ -62,6 +62,40 @@ describe('Project Factory', () => {
 
     assert(project1.id !== project2.id, 'Projects have different IDs');
     assert(typeof project1.id === 'number', 'ID is a number');
+  });
+
+  it('rejects empty names', () => {
+    try {
+      Project.createProject({ name: '' });
+      assert(false, 'Should throw error for empty name');
+    } catch (error) {
+      assert(error.message.includes('empty'), 'Throws error for empty name');
+    }
+  });
+
+  it('rejects whitespace-only names', () => {
+    try {
+      Project.createProject({ name: '   ' });
+      assert(false, 'Should throw error for whitespace name');
+    } catch (error) {
+      assert(error.message.includes('empty'), 'Throws error for whitespace-only name');
+    }
+  });
+
+  it('rejects duplicate names', () => {
+    const project1 = Project.createProject({ name: 'Unique Name' });
+
+    try {
+      Project.createProject({ name: 'Unique Name' });
+      assert(false, 'Should throw error for duplicate name');
+    } catch (error) {
+      assert(error.message.includes('already exists'), 'Throws error for duplicate name');
+    }
+  });
+
+  it('trims whitespace from names', () => {
+    const project = Project.createProject({ name: '  Trimmed Name  ' });
+    assert(project.name === 'Trimmed Name', 'Name is trimmed');
   });
 });
 

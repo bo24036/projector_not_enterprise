@@ -11,9 +11,9 @@ registerHandler('CREATE_PROJECT', (state, action) => {
       effects: [],
     };
   } catch (error) {
-    console.error('Failed to create project:', error.message);
+    alert(error.message);
     return {
-      state: { ...state, isCreatingProject: false },
+      state,
       effects: [],
     };
   }

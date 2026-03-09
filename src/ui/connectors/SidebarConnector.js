@@ -10,7 +10,7 @@ export function initSidebarConnector(containerSelector, state) {
   const container = document.querySelector(containerSelector);
   if (!container) return;
 
-  const projects = Project.getAllProjects();
+  const projects = Project.getAllProjects() || [];
 
   const projectsHtml = projects.map(project =>
     ProjectListItem({
@@ -47,12 +47,6 @@ export function initSidebarConnector(containerSelector, state) {
   render(template, container);
 
   function handleSave(name) {
-    const projects = Project.getAllProjects();
-    if (projects.some(p => p.name === name)) {
-      alert('A project with this name already exists.');
-      return;
-    }
-
     dispatch({ type: 'CREATE_PROJECT', payload: { name } });
   }
 }
