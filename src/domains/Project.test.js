@@ -30,11 +30,6 @@ function it(testName, fn) {
   }
 }
 
-// Reset cache before each test suite
-function beforeEach() {
-  Project._resetCacheForTesting();
-}
-
 // Tests
 describe('Project Factory', () => {
   it('creates a project with required fields', () => {

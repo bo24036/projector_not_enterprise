@@ -54,12 +54,3 @@ h5,
 h6 {
   font-weight: var(--font-weight-bold);
 }
-
-a {
-  color: var(--color-primary);
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
-}

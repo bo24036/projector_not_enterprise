@@ -29,11 +29,6 @@ for (const file of components) {
   try {
     const code = fs.readFileSync(filepath, 'utf8');
 
-    // Check file exists
-    if (!fs.existsSync(filepath)) {
-      throw new Error('File not found');
-    }
-
     // Check for export statement
     if (!code.includes('export ')) {
       throw new Error('No export found');
