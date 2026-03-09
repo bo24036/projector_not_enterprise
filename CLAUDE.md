@@ -122,6 +122,7 @@ State changes follow a synchronous-to-deferred pipeline to prevent re-entrancy:
   - Use Inline CSS Variables for continuous values (e.g., style="--progress: 60%"). Do not manipulate .style.width via JS.
 - Ban List: No !important, display: contents, or position: absolute.
   - Exception: Only with explicit user approval. Before using position: absolute to solve a layout problem, describe the use case and ask for confirmation.
+- HTML-First: Don't use CSS tricks, hacks, or workarounds when HTML can do things more simply. Use native HTML capabilities (autofocus, disabled, form elements, semantic tags) before reaching for CSS solutions.
 
 ## File & Folder Structure
 
