@@ -111,6 +111,7 @@ State changes follow a synchronous-to-deferred pipeline to prevent re-entrancy:
   3. Render with fresh props synchronously
 - **State Consistency:** All connectors in a render cycle receive the same state snapshot, preventing race conditions.
 - **DOM Efficiency:** lit-html's virtual DOM diffing ensures only changed DOM nodes are updated. No manual optimization needed.
+- **Template Conditionals:** It is acceptable to render different components based on state conditionals (e.g., `isCreatingProject ? InputForm : Button`). This is template-level composition, not a CSS workaround. Reserve CSS class toggling for cases where the same component should show/hide different UI regions based on state.
 
 ### Styling & Layout
 
@@ -126,12 +127,12 @@ State changes follow a synchronous-to-deferred pipeline to prevent re-entrancy:
 
 ## File & Folder Structure
 
-- js/domains/: Isolated factories, object changers, persistence, and Domain Queries.
-- js/handlers/: Modular UI state handlers that update state and trigger effects.
-- js/effects/: Asynchronous side-effect logic (I/O, fetches, timers).
-- js/utils/: Synchronous utility functions that meet commonly recurring needs.
-- js/ui/components/: Rendering logic for dumb components.
-- js/ui/connectors/: Domain-specific (one or more) data-binding components (Smart components). These connect state and domains to dumb components.
+- src/domains/: Isolated factories, object changers, persistence, and Domain Queries.
+- src/handlers/: Modular UI state handlers that update state and trigger effects.
+- src/effects/: Asynchronous side-effect logic (I/O, fetches, timers).
+- src/utils/: Synchronous utility functions that meet commonly recurring needs.
+- src/ui/components/: Rendering logic for dumb components.
+- src/ui/connectors/: Domain-specific (one or more) data-binding components (Smart components). These connect state and domains to dumb components.
 
 ## Service Worker & Cache Strategy
 
