@@ -1,6 +1,8 @@
 const projectCache = new Map();
 let nextId = 1;
 
+const ERROR_PROJECT_NOT_FOUND = 'Project not found';
+
 export function createProject(overrides = {}) {
   const name = overrides.name || '';
 
@@ -48,7 +50,7 @@ export function renameProject(id, newName) {
 
   const project = getProject(id);
   if (!project) {
-    throw new Error('Project not found');
+    throw new Error(ERROR_PROJECT_NOT_FOUND);
   }
 
   project.name = trimmedName;
@@ -58,7 +60,7 @@ export function renameProject(id, newName) {
 export function updateDescription(id, description) {
   const project = getProject(id);
   if (!project) {
-    throw new Error('Project not found');
+    throw new Error(ERROR_PROJECT_NOT_FOUND);
   }
 
   project.description = description || '';
@@ -68,7 +70,7 @@ export function updateDescription(id, description) {
 export function deleteProject(id) {
   const project = getProject(id);
   if (!project) {
-    throw new Error('Project not found');
+    throw new Error(ERROR_PROJECT_NOT_FOUND);
   }
 
   projectCache.delete(id);
