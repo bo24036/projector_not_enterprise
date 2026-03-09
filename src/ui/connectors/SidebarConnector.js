@@ -1,5 +1,6 @@
 import { html, render } from 'https://unpkg.com/lit-html@2/lit-html.js';
 import { ProjectListItem } from '../components/ProjectListItem.js';
+import { ProjectNewItem } from '../components/ProjectNewItem.js';
 import { ProjectInput } from '../components/ProjectInput.js';
 import * as Project from '../../domains/Project.js';
 import { getState, dispatch, watch } from '../../state.js';
@@ -24,6 +25,18 @@ export function initSidebarConnector(containerSelector) {
       })
     );
 
+    // Add the new project item as the last entry in the list
+    const newProjectItem = state.isCreatingProject
+      ? ProjectInput({
+          onSave: handleSave,
+          onCancel: () => dispatch({ type: 'CANCEL_CREATE_PROJECT' }),
+        })
+      : ProjectNewItem({
+          onStartCreate: () => dispatch({ type: 'START_CREATE_PROJECT' }),
+        });
+
+    const listItems = [...projectsHtml, newProjectItem];
+
     const template = html`
       <div class="sidebar">
         <div class="sidebar__header">
@@ -31,25 +44,7 @@ export function initSidebarConnector(containerSelector) {
         </div>
 
         <div class="sidebar__list">
-          ${projectsHtml.length > 0
-            ? projectsHtml
-            : html`<p class="sidebar__empty">No projects yet</p>`}
-        </div>
-
-        <div class="sidebar__new-project">
-          ${state.isCreatingProject
-            ? ProjectInput({
-                onSave: handleSave,
-                onCancel: () => dispatch({ type: 'CANCEL_CREATE_PROJECT' }),
-              })
-            : html`
-                <button
-                  class="sidebar__new-button"
-                  @click=${() => dispatch({ type: 'START_CREATE_PROJECT' })}
-                >
-                  + New Project
-                </button>
-              `}
+          ${listItems}
         </div>
       </div>
     `;

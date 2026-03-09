@@ -18,7 +18,7 @@ export function ProjectInput({ onSave, onCancel }) {
   }
 
   return html`
-    <div class="project-input">
+    <div class="project-list-item project-list-item--editing">
       <input
         class="project-input__field"
         type="text"
@@ -27,12 +27,14 @@ export function ProjectInput({ onSave, onCancel }) {
         @input=${handleInput}
         autofocus
       />
-      <button class="project-input__save" @click=${() => onSave(inputValue.trim())}>
-        Save
-      </button>
-      <button class="project-input__cancel" @click=${onCancel}>
-        Cancel
-      </button>
+      <div class="project-input__controls">
+        <button class="project-input__ok" @click=${() => onSave(inputValue.trim())} title="Save">
+          ✓
+        </button>
+        <button class="project-input__cancel" @click=${onCancel} title="Cancel">
+          ✕
+        </button>
+      </div>
     </div>
   `;
 }
