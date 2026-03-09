@@ -12,7 +12,7 @@
   background-color: var(--color-surface);
   border-right: var(--border-width) solid var(--color-border);
   overflow-y: auto;
-  overflow-x: hidden;
+  overflow-x: visible;
   padding: var(--spacing-md);
   gap: var(--spacing-md);
 }
