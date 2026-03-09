@@ -24,6 +24,7 @@ export function ProjectDetail({ project, onNameChange, onDescriptionChange, onDe
           <input
             class="project-detail__name"
             type="text"
+            aria-label="Project name"
             value=${project.name}
             @change=${handleNameChange}
           />
