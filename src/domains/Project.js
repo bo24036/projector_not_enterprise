@@ -15,6 +15,7 @@ if (typeof window !== 'undefined') {
 const projectCache = new Map();
 const writeQueue = new Map(); // Tracks queued IDs to prevent concurrent writes
 const fetchQueue = new Set(); // Tracks IDs currently being fetched (prevents duplicate fetches)
+let projectsLoaded = false; // Tracks if we've already fetched all projects from IDB
 let nextId = 1;
 let db = null;
 
@@ -140,7 +141,38 @@ export function getProject(id) {
 }
 
 export function getAllProjects() {
-  return Array.from(projectCache.values()).sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+  const cached = Array.from(projectCache.values()).sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+
+  // If we already have projects in cache, return them
+  if (cached.length > 0 || projectsLoaded) {
+    return cached;
+  }
+
+  // Cache miss: queue async fetch of all projects from IDB
+  projectsLoaded = true;
+  queueMicrotask(async () => {
+    try {
+      const database = await getDB();
+      if (!database) return;
+
+      const allProjects = await database.getAll('projects');
+      if (allProjects && allProjects.length > 0) {
+        // Populate cache with all projects
+        allProjects.forEach(project => projectCache.set(project.id, project));
+        // Dispatch fulfillment action to trigger re-render
+        if (dispatch) {
+          dispatch({ type: 'PROJECTS_LOADED', payload: { projects: allProjects } });
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch all projects:', error.message);
+    } finally {
+      // Reset flag to allow retry if needed
+      projectsLoaded = false;
+    }
+  });
+
+  return cached; // Return empty array initially
 }
 
 export function renameProject(id, newName) {
@@ -187,8 +219,26 @@ export function deleteProject(id) {
   return true;
 }
 
+// Initialize: Determine nextId from IDB to ensure new projects don't overwrite existing ones
+export async function initializeIdCounter() {
+  if (!openDB) return; // Skip in Node.js test environment
+
+  try {
+    const database = await getDB();
+    const keys = await database.getAllKeys('projects');
+    if (keys.length > 0) {
+      const maxId = Math.max(...keys);
+      nextId = maxId + 1;
+    }
+  } catch (error) {
+    console.error('Failed to initialize ID counter:', error.message);
+    // Continue with default nextId = 1 if initialization fails
+  }
+}
+
 // Test utility - clears cache and resets ID counter
 export function _resetCacheForTesting() {
   projectCache.clear();
+  projectsLoaded = false;
   nextId = 1;
 }

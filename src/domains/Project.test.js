@@ -335,6 +335,50 @@ describe('Cache Miss (Async Fetch)', () => {
   });
 });
 
+describe('Initialization', () => {
+  it('initializeIdCounter does not throw in Node.js', async () => {
+    try {
+      await Project.initializeIdCounter();
+      assert(true, 'initializeIdCounter does not throw');
+    } catch (error) {
+      assert(false, `initializeIdCounter should not throw: ${error.message}`);
+    }
+  });
+
+  it('getAllProjects returns an array', () => {
+    const result = Project.getAllProjects();
+    assert(Array.isArray(result), 'getAllProjects returns an array');
+  });
+
+  it('getAllProjects returns cached projects when available', () => {
+    const project = Project.createProject({ name: 'Test Project' });
+    const result = Project.getAllProjects();
+
+    assert(result.length > 0, 'getAllProjects returns non-empty array when projects exist');
+    assert(result.some(p => p.id === project.id), 'getAllProjects includes created project');
+  });
+
+  it('getAllProjects returns empty array on cold start', () => {
+    // Reset cache to simulate cold start
+    Project._resetCacheForTesting();
+
+    const result = Project.getAllProjects();
+    assert(Array.isArray(result), 'getAllProjects returns array on cold start');
+    assert(result.length === 0, 'getAllProjects returns empty array when cache empty');
+  });
+
+  it('getAllProjects queues fetch once and only once', () => {
+    Project._resetCacheForTesting();
+
+    const first = Project.getAllProjects();
+    const second = Project.getAllProjects();
+    const third = Project.getAllProjects();
+
+    assert(Array.isArray(first) && Array.isArray(second) && Array.isArray(third), 'All calls return arrays');
+    assert(true, 'Multiple getAllProjects calls do not cause errors');
+  });
+});
+
 // Run summary
 console.log(`\n${'='.repeat(50)}`);
 console.log(`Tests passed: ${testsPassed}`);

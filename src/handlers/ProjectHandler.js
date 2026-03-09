@@ -104,3 +104,12 @@ registerHandler('PROJECT_LOADED', (state) => {
     effects: [],
   };
 });
+
+registerHandler('PROJECTS_LOADED', (state) => {
+  // All projects are already in cache from domain's fetch-all.
+  // This handler just triggers a re-render via setState.
+  return {
+    state,
+    effects: [],
+  };
+});
