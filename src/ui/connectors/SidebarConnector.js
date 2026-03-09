@@ -3,30 +3,31 @@ import { ProjectListItem } from '../components/ProjectListItem.js';
 import { ProjectNewItem } from '../components/ProjectNewItem.js';
 import { ProjectInput } from '../components/ProjectInput.js';
 import * as Project from '../../domains/Project.js';
-import { getState, dispatch, watch } from '../../state.js';
+import { dispatch, watch } from '../../state.js';
 import { navigateToProject } from '../../utils/router.js';
 
 export function initSidebarConnector(containerSelector) {
   const container = document.querySelector(containerSelector);
   if (!container) return;
 
-  let unsubscribeState = null;
-  let unsubscribeCreating = null;
+  let currentProjectId = null;
+  let isCreatingProject = false;
+  let unsubscribeCurrentProjectId = null;
+  let unsubscribeIsCreating = null;
 
   function renderSidebar() {
-    const state = getState();
     const projects = Project.getAllProjects();
 
     const projectsHtml = projects.map(project =>
       ProjectListItem({
         project,
-        isSelected: state.currentProjectId === project.id,
+        isSelected: currentProjectId === project.id,
         onSelect: () => navigateToProject(project.id),
       })
     );
 
     // Add the new project item as the last entry in the list
-    const newProjectItem = state.isCreatingProject
+    const newProjectItem = isCreatingProject
       ? ProjectInput({
           onSave: handleSave,
           onCancel: () => dispatch({ type: 'CANCEL_CREATE_PROJECT' }),
@@ -62,15 +63,22 @@ export function initSidebarConnector(containerSelector) {
     dispatch({ type: 'CREATE_PROJECT', payload: { name } });
   }
 
-  unsubscribeState = watch('currentProjectId', renderSidebar);
-  unsubscribeCreating = watch('isCreatingProject', renderSidebar);
+  unsubscribeCurrentProjectId = watch('currentProjectId', (newId) => {
+    currentProjectId = newId;
+    renderSidebar();
+  });
+
+  unsubscribeIsCreating = watch('isCreatingProject', (isCreating) => {
+    isCreatingProject = isCreating;
+    renderSidebar();
+  });
 
   renderSidebar();
 
   return {
     destroy: () => {
-      if (unsubscribeState) unsubscribeState();
-      if (unsubscribeCreating) unsubscribeCreating();
+      if (unsubscribeCurrentProjectId) unsubscribeCurrentProjectId();
+      if (unsubscribeIsCreating) unsubscribeIsCreating();
     },
   };
 }

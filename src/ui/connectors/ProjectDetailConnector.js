@@ -1,18 +1,18 @@
 import { html, render } from 'https://unpkg.com/lit-html@2/lit-html.js';
 import { ProjectDetail } from '../components/ProjectDetail.js';
 import * as Project from '../../domains/Project.js';
-import { getState, dispatch, watch } from '../../state.js';
+import { dispatch, watch } from '../../state.js';
 import { navigateToList } from '../../utils/router.js';
 
 export function initProjectDetailConnector(containerSelector) {
   const container = document.querySelector(containerSelector);
   if (!container) return;
 
+  let currentProjectId = null;
   let unsubscribeState = null;
 
   function renderDetail() {
-    const state = getState();
-    const project = state.currentProjectId ? Project.getProject(state.currentProjectId) : null;
+    const project = currentProjectId ? Project.getProject(currentProjectId) : null;
 
     if (!project) {
       const template = html`
@@ -50,7 +50,10 @@ export function initProjectDetailConnector(containerSelector) {
     render(template, container);
   }
 
-  unsubscribeState = watch('currentProjectId', renderDetail);
+  unsubscribeState = watch('currentProjectId', (newId) => {
+    currentProjectId = newId;
+    renderDetail();
+  });
 
   renderDetail();
 

@@ -7,11 +7,7 @@ const watchers = new Map();
 let renderScheduled = false;
 let pendingStateUpdates = {};
 
-export function getState() {
-  return state;
-}
-
-export function setState(updates) {
+function setState(updates) {
   // Collect updates without applying yet
   Object.assign(pendingStateUpdates, updates);
 
