@@ -20,8 +20,7 @@ export function ProjectInput({ onSave, onCancel }) {
 
   function handleBlur() {
     if (!inputValue.trim()) {
-      // Defer the cancel to avoid DOM removal during blur event handling
-      setTimeout(onCancel, 0);
+      onCancel();
     }
   }
 

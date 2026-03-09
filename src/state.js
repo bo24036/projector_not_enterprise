@@ -4,14 +4,33 @@ const state = {
 };
 
 const watchers = new Map();
+let renderScheduled = false;
+let pendingStateUpdates = {};
 
 export function getState() {
   return state;
 }
 
 export function setState(updates) {
-  Object.assign(state, updates);
-  notifyWatchers();
+  // Collect updates without applying yet
+  Object.assign(pendingStateUpdates, updates);
+
+  // If render already scheduled, all pending updates will be applied in the next frame
+  if (renderScheduled) {
+    return;
+  }
+
+  // Schedule render for next animation frame
+  renderScheduled = true;
+  requestAnimationFrame(() => {
+    // Apply all collected updates at once
+    Object.assign(state, pendingStateUpdates);
+    pendingStateUpdates = {};
+    renderScheduled = false;
+
+    // Notify watchers after all updates applied
+    notifyWatchers();
+  });
 }
 
 export function watch(key, callback) {
