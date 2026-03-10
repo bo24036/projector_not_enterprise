@@ -24,7 +24,7 @@ async function getDatabase() {
 
   if (db) return db;
 
-  db = await openDB('projector', 1, {
+  db = await openDB('projector', 2, {
     upgrade(db) {
       if (!db.objectStoreNames.contains('projects')) {
         db.createObjectStore('projects', { keyPath: 'id' });
