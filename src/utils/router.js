@@ -9,8 +9,8 @@ function handleRouteChange() {
   const hash = window.location.hash;
 
   if (hash.startsWith('#project/')) {
-    const projectId = parseInt(hash.replace('#project/', ''), 10);
-    if (!isNaN(projectId)) {
+    const projectId = hash.replace('#project/', '');
+    if (projectId) {
       dispatch({ type: 'SELECT_PROJECT', payload: { projectId } });
       return;
     }
