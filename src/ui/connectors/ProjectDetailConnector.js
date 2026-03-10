@@ -1,5 +1,6 @@
 import { html, render } from 'https://unpkg.com/lit-html@2/lit-html.js';
 import { ProjectDetail } from '../components/ProjectDetail.js';
+import { TaskListConnector } from './TaskListConnector.js';
 import * as Project from '../../domains/Project.js';
 import { dispatch } from '../../state.js';
 import { navigateToList } from '../../utils/router.js';
@@ -50,6 +51,11 @@ export function initProjectDetailConnector(containerSelector, state) {
           navigateToList();
         },
       })}
+
+      <div class="project-detail__tasks-section">
+        <h3 class="project-detail__section-title">Tasks</h3>
+        ${TaskListConnector({ projectId: project.id, state })}
+      </div>
     </div>
   `;
 
