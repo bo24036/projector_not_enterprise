@@ -10,9 +10,11 @@ export function initSidebarConnector(containerSelector, state) {
   const container = document.querySelector(containerSelector);
   if (!container) return;
 
-  const projects = Project.getAllProjects() || [];
+  const allProjects = Project.getAllProjects() || [];
+  const activeProjects = allProjects.filter(p => !p.archived);
+  const archivedProjects = allProjects.filter(p => p.archived);
 
-  const projectsHtml = projects.map(project =>
+  const activeProjectsHtml = activeProjects.map(project =>
     ProjectListItem({
       project,
       isSelected: state.currentProjectId === project.id,
@@ -20,7 +22,7 @@ export function initSidebarConnector(containerSelector, state) {
     })
   );
 
-  // Add the new project item as the last entry in the list
+  // Add the new project item as the last entry in the active projects list
   const newProjectItem = state.isCreatingProject
     ? ProjectInput({
         onSave: handleSave,
@@ -30,7 +32,25 @@ export function initSidebarConnector(containerSelector, state) {
         onStartCreate: () => dispatch({ type: 'START_CREATE_PROJECT' }),
       });
 
-  const listItems = [...projectsHtml, newProjectItem];
+  const activeListItems = [...activeProjectsHtml, newProjectItem];
+
+  // Render archived projects only if toggle is enabled
+  const archivedSection = state.showArchivedProjects && archivedProjects.length > 0
+    ? html`
+      <div class="sidebar__archived-section">
+        <div class="sidebar__archived-list">
+          ${archivedProjects.map(project =>
+            ProjectListItem({
+              project,
+              isSelected: state.currentProjectId === project.id,
+              onSelect: () => navigateToProject(project.id),
+              onUnarchive: () => dispatch({ type: 'UNARCHIVE_PROJECT', payload: { projectId: project.id } }),
+            })
+          )}
+        </div>
+      </div>
+    `
+    : html``;
 
   const template = html`
     <div class="sidebar">
@@ -39,8 +59,14 @@ export function initSidebarConnector(containerSelector, state) {
       </div>
 
       <div class="sidebar__list">
-        ${listItems}
+        ${activeListItems}
       </div>
+
+      <button class="sidebar__archived-toggle" @click=${() => dispatch({ type: 'TOGGLE_ARCHIVED_PROJECTS' })}>
+        ≡ Archived
+      </button>
+
+      ${archivedSection}
     </div>
   `;
 
