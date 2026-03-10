@@ -33,7 +33,7 @@ registerHandler('RENAME_PROJECT', (state, action) => {
   try {
     Project.renameProject(projectId, newName);
     return {
-      state: { ...state },
+      state,
       effects: [],
     };
   } catch (error) {
@@ -51,7 +51,7 @@ registerHandler('UPDATE_DESCRIPTION', (state, action) => {
   try {
     Project.updateDescription(projectId, description);
     return {
-      state: { ...state },
+      state,
       effects: [],
     };
   } catch (error) {
@@ -107,7 +107,7 @@ registerHandler('UNARCHIVE_PROJECT', (state, action) => {
   try {
     Project.unarchiveProject(projectId);
     return {
-      state: { ...state },
+      state,
       effects: [],
     };
   } catch (error) {
@@ -131,9 +131,8 @@ registerHandler('TOGGLE_FUNDED', (state, action) => {
 
   try {
     Project.toggleFunded(projectId);
-    // Force re-render by returning fresh state object (triggers connector re-render)
     return {
-      state: { ...state },
+      state,
       effects: [],
     };
   } catch (error) {
@@ -163,7 +162,7 @@ registerHandler('PROJECT_LOADED', (state) => {
   // Project is already in cache from domain's cache-miss fetch.
   // This handler just triggers a re-render via setState.
   return {
-    state: { ...state },
+    state,
     effects: [],
   };
 });
@@ -172,7 +171,7 @@ registerHandler('PROJECTS_LOADED', (state) => {
   // All projects are already in cache from domain's fetch-all.
   // This handler just triggers a re-render via setState.
   return {
-    state: { ...state },
+    state,
     effects: [],
   };
 });
