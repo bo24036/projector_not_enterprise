@@ -68,9 +68,8 @@ registerHandler('DELETE_PROJECT', (state, action) => {
 
   try {
     Project.deleteProject(projectId);
-    const newCurrentId = state.currentProjectId === projectId ? null : state.currentProjectId;
     return {
-      state: { ...state, currentProjectId: newCurrentId },
+      state,
       effects: [],
     };
   } catch (error) {
@@ -87,9 +86,8 @@ registerHandler('ARCHIVE_PROJECT', (state, action) => {
 
   try {
     Project.archiveProject(projectId);
-    const newCurrentId = state.currentProjectId === projectId ? null : state.currentProjectId;
     return {
-      state: { ...state, currentProjectId: newCurrentId },
+      state,
       effects: [],
     };
   } catch (error) {
