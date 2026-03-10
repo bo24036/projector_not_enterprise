@@ -134,8 +134,6 @@ export function getAllProjects() {
       }
     } catch (error) {
       console.error('Failed to fetch all projects:', error.message);
-    } finally {
-      projectsLoaded = false;
     }
   });
 
