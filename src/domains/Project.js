@@ -59,6 +59,7 @@ export function createProject(overrides = {}) {
     name,
     description: overrides.description || '',
     archived: overrides.archived || false,
+    funded: overrides.funded || false,
     createdAt: overrides.createdAt || new Date().toISOString(),
   };
 
@@ -192,6 +193,17 @@ export function unarchiveProject(id) {
   }
 
   project.archived = false;
+  serialize(project, 'put');
+  return project;
+}
+
+export function toggleFunded(id) {
+  const project = getProject(id);
+  if (!project) {
+    throw new Error(ERROR_PROJECT_NOT_FOUND);
+  }
+
+  project.funded = !project.funded;
   serialize(project, 'put');
   return project;
 }

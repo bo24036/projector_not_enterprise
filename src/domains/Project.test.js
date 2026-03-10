@@ -323,6 +323,44 @@ describe('Archive / Unarchive Project', () => {
   });
 });
 
+describe('Toggle Funded', () => {
+  it('toggles funded status successfully', () => {
+    const project = Project.createProject({ name: 'Funded Test' });
+    assert(project.funded === false, 'Project initially not funded');
+
+    Project.toggleFunded(project.id);
+
+    const toggled = Project.getProject(project.id);
+    assert(toggled.funded === true, 'Project is now funded');
+  });
+
+  it('toggles funded back to false', () => {
+    const project = Project.createProject({ name: 'Toggle Test' });
+    Project.toggleFunded(project.id);
+    Project.toggleFunded(project.id);
+
+    const toggled = Project.getProject(project.id);
+    assert(toggled.funded === false, 'Project is no longer funded');
+  });
+
+  it('toggleFunded throws error for non-existent project', () => {
+    try {
+      Project.toggleFunded(999999);
+      assert(false, 'Should throw error for non-existent project');
+    } catch (error) {
+      assert(error.message.includes('not found'), 'Throws error for missing project');
+    }
+  });
+
+  it('synchronously updates cache on toggleFunded (write-through)', () => {
+    const project = Project.createProject({ name: 'Test' });
+    Project.toggleFunded(project.id);
+
+    const retrieved = Project.getProject(project.id);
+    assert(retrieved.funded === true, 'Funded toggle immediately in cache');
+  });
+});
+
 describe('Edge Cases', () => {
   it('handles names with special characters', () => {
     const project = Project.createProject({
