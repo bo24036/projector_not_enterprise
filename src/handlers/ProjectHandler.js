@@ -82,6 +82,50 @@ registerHandler('DELETE_PROJECT', (state, action) => {
   }
 });
 
+registerHandler('ARCHIVE_PROJECT', (state, action) => {
+  const { projectId } = action.payload;
+
+  try {
+    Project.archiveProject(projectId);
+    const newCurrentId = state.currentProjectId === projectId ? null : state.currentProjectId;
+    return {
+      state: { ...state, currentProjectId: newCurrentId },
+      effects: [],
+    };
+  } catch (error) {
+    console.error('Failed to archive project:', error.message);
+    return {
+      state,
+      effects: [],
+    };
+  }
+});
+
+registerHandler('UNARCHIVE_PROJECT', (state, action) => {
+  const { projectId } = action.payload;
+
+  try {
+    Project.unarchiveProject(projectId);
+    return {
+      state,
+      effects: [],
+    };
+  } catch (error) {
+    console.error('Failed to unarchive project:', error.message);
+    return {
+      state,
+      effects: [],
+    };
+  }
+});
+
+registerHandler('TOGGLE_ARCHIVED_PROJECTS', (state) => {
+  return {
+    state: { ...state, showArchivedProjects: !state.showArchivedProjects },
+    effects: [],
+  };
+});
+
 registerHandler('START_CREATE_PROJECT', (state, action) => {
   return {
     state: { ...state, isCreatingProject: true },
