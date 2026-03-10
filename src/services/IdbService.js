@@ -4,14 +4,16 @@
 let openDB;
 let db = null;
 
-// Dynamically import idb from import map (browser) or fail gracefully (Node.js tests)
-import('idb')
+// Promise that resolves when idb module is loaded
+const idbReady = import('idb')
   .then(module => {
     openDB = module.openDB;
+    return openDB;
   })
   .catch(() => {
     // Node.js test environment: import map doesn't exist, idb unavailable
     openDB = undefined;
+    return undefined;
   });
 
 // Initialize and return the database connection.
@@ -74,3 +76,6 @@ export async function deleteProject(id) {
     console.error(`Failed to delete project ${id}:`, error.message);
   }
 }
+
+// Export promise that resolves when idb module is ready
+export { idbReady };

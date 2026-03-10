@@ -3,6 +3,7 @@ import { initSidebarConnector } from './ui/connectors/SidebarConnector.js';
 import { initProjectDetailConnector } from './ui/connectors/ProjectDetailConnector.js';
 import { initRouter } from './utils/router.js';
 import { getState, setRootRenderer } from './state.js';
+import { idbReady } from './services/IdbService.js';
 
 function renderApp() {
   const state = getState();
@@ -10,7 +11,11 @@ function renderApp() {
   initProjectDetailConnector('#main-content', state);
 }
 
-function initApp() {
+async function initApp() {
+  // Wait for IDB module to be ready before rendering
+  // This ensures getAllProjectsFromIdb() has openDB available on hard reload
+  await idbReady;
+
   // Register root renderer before router init so initial navigation triggers render
   setRootRenderer(renderApp);
 
