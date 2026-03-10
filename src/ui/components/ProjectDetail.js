@@ -52,7 +52,7 @@ export function ProjectDetail({ project, onNameChange, onDescriptionChange, onAr
             ?disabled=${isArchived}
             @change=${handleToggleFunded}
           />
-          <span class="project-detail__funded-icon" aria-hidden="true">⭐</span>
+          <span class="project-detail__funded-label" aria-hidden="true">$</span>
         </div>
         <div class="project-detail__button-group">
           ${isArchived
