@@ -126,6 +126,24 @@ registerHandler('TOGGLE_ARCHIVED_PROJECTS', (state) => {
   };
 });
 
+registerHandler('TOGGLE_FUNDED', (state, action) => {
+  const { projectId } = action.payload;
+
+  try {
+    Project.toggleFunded(projectId);
+    return {
+      state,
+      effects: [],
+    };
+  } catch (error) {
+    console.error('Failed to toggle funded:', error.message);
+    return {
+      state,
+      effects: [],
+    };
+  }
+});
+
 registerHandler('START_CREATE_PROJECT', (state, action) => {
   return {
     state: { ...state, isCreatingProject: true },
