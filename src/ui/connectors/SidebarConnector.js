@@ -24,8 +24,8 @@ export function initSidebarConnector(containerSelector, state) {
         onStartCreate: () => dispatch({ type: 'START_CREATE_PROJECT' }),
       });
 
-  // Render archived projects only if toggle is enabled
-  const archivedSection = state.showArchivedProjects && archivedProjects.length > 0
+  // Render archived projects only if toggle is enabled and there are archived projects
+  const archivedList = state.showArchivedProjects && archivedProjects.length > 0
     ? html`
       <div class="sidebar__archived-list">
         ${archivedProjects.map(project =>
@@ -58,18 +58,13 @@ export function initSidebarConnector(containerSelector, state) {
         ${newProjectItem}
       </div>
 
-      ${archivedProjects.length > 0
-        ? html`
-          <div class="sidebar__archived-section">
-            <button class="sidebar__archived-header" @click=${() => dispatch({ type: 'TOGGLE_ARCHIVED_PROJECTS' })}>
-              <span class="sidebar__archived-indicator">${archivedToggleIndicator}</span>
-              Archived
-            </button>
-            ${archivedSection}
-          </div>
-        `
-        : html``
-      }
+      <div class="sidebar__archived-section">
+        <button class="sidebar__archived-header" @click=${() => dispatch({ type: 'TOGGLE_ARCHIVED_PROJECTS' })}>
+          <span class="sidebar__archived-indicator">${archivedToggleIndicator}</span>
+          Archived
+        </button>
+        ${archivedList}
+      </div>
     </div>
   `;
 
