@@ -35,6 +35,10 @@ export function initProjectDetailConnector(containerSelector, state) {
             payload: { projectId: project.id, description },
           });
         },
+        onArchive: () => {
+          dispatch({ type: 'ARCHIVE_PROJECT', payload: { projectId: project.id } });
+          navigateToList();
+        },
         onDelete: () => {
           dispatch({ type: 'DELETE_PROJECT', payload: { projectId: project.id } });
           navigateToList();

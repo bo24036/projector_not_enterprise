@@ -1,6 +1,6 @@
 import { html } from 'https://unpkg.com/lit-html@2/lit-html.js';
 
-export function ProjectDetail({ project, onNameChange, onDescriptionChange, onDelete }) {
+export function ProjectDetail({ project, onNameChange, onDescriptionChange, onArchive, onDelete }) {
   if (!project) return html``;
 
   function handleNameChange(event) {
@@ -9,6 +9,10 @@ export function ProjectDetail({ project, onNameChange, onDescriptionChange, onDe
 
   function handleDescriptionChange(event) {
     onDescriptionChange(event.target.value);
+  }
+
+  function handleArchive() {
+    onArchive();
   }
 
   function handleDelete() {
@@ -30,9 +34,14 @@ export function ProjectDetail({ project, onNameChange, onDescriptionChange, onDe
           />
           <span class="project-detail__edit-icon" aria-hidden="true">✎</span>
         </div>
-        <button class="project-detail__delete-button" @click=${handleDelete}>
-          Delete
-        </button>
+        <div class="project-detail__button-group">
+          <button class="project-detail__archive-button" @click=${handleArchive}>
+            Archive
+          </button>
+          <button class="project-detail__delete-button" @click=${handleDelete}>
+            Delete
+          </button>
+        </div>
       </div>
 
       <div class="project-detail__description-section">
