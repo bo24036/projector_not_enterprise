@@ -1,53 +1,20 @@
 // Import dispatch from local module (always available)
 import { dispatch } from '../state.js';
 
-// Dynamically import idb from import map (browser) or fail gracefully (Node.js tests)
-let openDB;
-import('idb')
-  .then(module => {
-    openDB = module.openDB;
-  })
-  .catch(() => {
-    // Node.js test environment: import map doesn't exist, idb unavailable
-    openDB = undefined;
-  });
+// Import IDB operations from service layer (isolates persistence I/O)
+import { getProject as getProjectFromIdb, getAllProjects as getAllProjectsFromIdb, putProject as putProjectToIdb, deleteProject as deleteProjectFromIdb, getMaxProjectId } from '../services/IdbService.js';
 
 const projectCache = new Map();
 const writeQueue = new Map(); // Tracks queued IDs to prevent concurrent writes
 const fetchQueue = new Set(); // Tracks IDs currently being fetched (prevents duplicate fetches)
 let projectsLoaded = false; // Tracks if we've already fetched all projects from IDB
 let nextId = 1;
-let db = null;
 
 const ERROR_PROJECT_NOT_FOUND = 'Project not found';
 
-async function getDB() {
-  // If idb is not available (Node.js test environment), return null
-  if (!openDB) return null;
-
-  if (db) return db;
-
-  db = await openDB('projector', 1, {
-    upgrade(db) {
-      if (!db.objectStoreNames.contains('projects')) {
-        db.createObjectStore('projects', { keyPath: 'id' });
-      }
-    },
-  });
-  return db;
-}
-
-// Fetch a project from IDB. Returns undefined if not found.
-// In Node.js test environment where IDB is unavailable, returns undefined.
-export async function getItem(id) {
-  const database = await getDB();
-  if (!database) return undefined;
-  return database.get('projects', id);
-}
-
 // Queue a write to IDB. If already queued, replaces the previous write.
 // This ensures deduplication: rapid mutations to the same ID result in one final write.
-// Skips IDB in Node.js test environment where it's unavailable.
+// Delegates to IdbService; gracefully skips IDB if unavailable (Node.js test environment).
 function serialize(project, operation) {
   const id = project.id;
 
@@ -68,18 +35,10 @@ function serialize(project, operation) {
 
     writeQueue.delete(id);
 
-    try {
-      const database = await getDB();
-      if (!database) return; // IDB not available (Node.js test environment)
-
-      if (queued.operation === 'delete') {
-        await database.delete('projects', id);
-      } else {
-        await database.put('projects', queued.project);
-      }
-    } catch (error) {
-      console.error(`Failed to persist project ${id}:`, error.message);
-      // Cache is already correct; silent failure acceptable for routine mutations
+    if (queued.operation === 'delete') {
+      await deleteProjectFromIdb(queued.project.id);
+    } else {
+      await putProjectToIdb(queued.project);
     }
   });
 }
@@ -121,7 +80,7 @@ export function getProject(id) {
     fetchQueue.add(id);
     queueMicrotask(async () => {
       try {
-        const project = await getItem(id);
+        const project = await getProjectFromIdb(id);
         if (project) {
           // Populate cache
           projectCache.set(id, project);
@@ -153,10 +112,7 @@ export function getAllProjects() {
   projectsLoaded = true;
   queueMicrotask(async () => {
     try {
-      const database = await getDB();
-      if (!database) return;
-
-      const allProjects = await database.getAll('projects');
+      const allProjects = await getAllProjectsFromIdb();
       if (allProjects && allProjects.length > 0) {
         // Populate cache with all projects
         allProjects.forEach(project => projectCache.set(project.id, project));
@@ -222,14 +178,9 @@ export function deleteProject(id) {
 
 // Initialize: Determine nextId from IDB to ensure new projects don't overwrite existing ones
 export async function initializeIdCounter() {
-  // Skip in Node.js test environment (idb not available)
-  if (!openDB) return;
-
   try {
-    const database = await getDB();
-    const keys = await database.getAllKeys('projects');
-    if (keys.length > 0) {
-      const maxId = Math.max(...keys);
+    const maxId = await getMaxProjectId();
+    if (maxId > 0) {
       nextId = maxId + 1;
     }
   } catch (error) {

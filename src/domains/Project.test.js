@@ -296,9 +296,6 @@ describe('Persistence', () => {
     assert(retrieved === undefined, 'Project immediately removed from cache');
   });
 
-  it('exports getItem function for IDB fetching', () => {
-    assert(typeof Project.getItem === 'function', 'getItem is exported as a function');
-  });
 });
 
 describe('Cache Miss (Async Fetch)', () => {
@@ -314,12 +311,6 @@ describe('Cache Miss (Async Fetch)', () => {
     } catch (error) {
       assert(false, 'Cache miss should not throw');
     }
-  });
-
-  it('getItem returns undefined in Node.js test environment', async () => {
-    // In Node, IDB is unavailable, so getItem() returns undefined
-    const result = await Project.getItem(12345);
-    assert(result === undefined, 'getItem returns undefined when IDB unavailable');
   });
 
   it('queues fetch only once per ID (no duplicate fetches)', async () => {
