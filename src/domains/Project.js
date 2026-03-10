@@ -208,10 +208,21 @@ export function toggleFunded(id) {
   return project;
 }
 
-// Initialize: Determine nextId from IDB to ensure new projects don't overwrite existing ones
+// Initialize: Load all projects from IDB and determine nextId
+// Must be called before ANY project creation to ensure ID uniqueness
 export async function initializeIdCounter() {
   try {
-    const maxId = await getMaxProjectId();
+    // Preload all projects from IDB into cache synchronously
+    const allProjects = await getAllProjectsFromIdb();
+    if (allProjects && allProjects.length > 0) {
+      allProjects.forEach(project => projectCache.set(project.id, project));
+    }
+
+    // Determine nextId from the maximum ID in cache
+    const maxId = allProjects && allProjects.length > 0
+      ? Math.max(...allProjects.map(p => p.id))
+      : 0;
+
     if (maxId > 0) {
       nextId = maxId + 1;
     }
