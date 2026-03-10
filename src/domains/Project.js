@@ -50,7 +50,10 @@ export function createProject(overrides = {}) {
     throw new Error('Project name cannot be empty');
   }
 
-  if (getAllProjects().some(p => p.name === name)) {
+  // Check duplicates against in-memory cache (always available)
+  // Do not call getAllProjects() which may return empty during cache miss
+  const cachedProjects = Array.from(projectCache.values());
+  if (cachedProjects.some(p => p.name === name)) {
     throw new Error('Project name already exists');
   }
 
@@ -137,9 +140,10 @@ export function renameProject(id, newName) {
   }
 
   const trimmedName = newName.trim();
-  const allProjects = getAllProjects();
+  // Check duplicates against in-memory cache, not full list that may be async-loading
+  const cachedProjects = Array.from(projectCache.values());
 
-  if (allProjects.some(p => p.id !== id && p.name === trimmedName)) {
+  if (cachedProjects.some(p => p.id !== id && p.name === trimmedName)) {
     throw new Error('Project name already exists');
   }
 
@@ -208,21 +212,10 @@ export function toggleFunded(id) {
   return project;
 }
 
-// Initialize: Load all projects from IDB and determine nextId
-// Must be called before ANY project creation to ensure ID uniqueness
+// Initialize: Determine nextId from IDB to ensure new projects don't overwrite existing ones
 export async function initializeIdCounter() {
   try {
-    // Preload all projects from IDB into cache synchronously
-    const allProjects = await getAllProjectsFromIdb();
-    if (allProjects && allProjects.length > 0) {
-      allProjects.forEach(project => projectCache.set(project.id, project));
-    }
-
-    // Determine nextId from the maximum ID in cache
-    const maxId = allProjects && allProjects.length > 0
-      ? Math.max(...allProjects.map(p => p.id))
-      : 0;
-
+    const maxId = await getMaxProjectId();
     if (maxId > 0) {
       nextId = maxId + 1;
     }

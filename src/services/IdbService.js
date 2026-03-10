@@ -84,7 +84,9 @@ export async function getMaxProjectId() {
   try {
     const keys = await database.getAllKeys('projects');
     if (keys.length === 0) return 0;
-    return Math.max(...keys);
+    // Ensure keys are treated as numbers to avoid off-by-one errors
+    const numericKeys = keys.map(k => Number(k));
+    return Math.max(...numericKeys);
   } catch (error) {
     console.error('Failed to read project IDs from IDB:', error.message);
     return 0;
