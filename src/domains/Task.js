@@ -224,6 +224,31 @@ export function getTasksByProjectId(projectId) {
     .map(id => taskCache.get(id))
     .filter(task => task !== undefined);
 
+  // Cache miss: queue async fetch from IDB (fire-and-forget)
+  if (tasks.length === 0 && !projectIdIndex.has(projectId)) {
+    queueMicrotask(async () => {
+      try {
+        const projectTasks = await getTasksByProjectIdFromIdb(projectId);
+        if (projectTasks && projectTasks.length > 0) {
+          // Load tasks into cache
+          if (!projectIdIndex.has(projectId)) {
+            projectIdIndex.set(projectId, new Set());
+          }
+          const taskIdSet = projectIdIndex.get(projectId);
+          for (const task of projectTasks) {
+            taskCache.set(task.id, task);
+            taskIdSet.add(task.id);
+          }
+          if (dispatch) {
+            dispatch({ type: 'TASK_LOADED', payload: { tasks: projectTasks } });
+          }
+        }
+      } catch (error) {
+        console.error(`Failed to fetch tasks for project ${projectId}:`, error.message);
+      }
+    });
+  }
+
   // Sort by dueDate (soonest first), then tasks without due dates
   return tasks.sort((a, b) => {
     if (a.dueDate && b.dueDate) {
