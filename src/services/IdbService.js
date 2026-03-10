@@ -29,6 +29,9 @@ async function getDatabase() {
       if (!db.objectStoreNames.contains('projects')) {
         db.createObjectStore('projects', { keyPath: 'id' });
       }
+      if (!db.objectStoreNames.contains('tasks')) {
+        db.createObjectStore('tasks', { keyPath: 'id' });
+      }
     },
   });
   return db;
@@ -74,6 +77,49 @@ export async function deleteProject(id) {
     await database.delete('projects', id);
   } catch (error) {
     console.error(`Failed to delete project ${id}:`, error.message);
+  }
+}
+
+// Fetch a single task from IDB. Returns undefined if not found.
+// In Node.js test environment where IDB is unavailable, returns undefined.
+export async function getTask(id) {
+  const database = await getDatabase();
+  if (!database) return undefined;
+  return database.get('tasks', id);
+}
+
+// Fetch all tasks for a project from IDB. Returns empty array if none exist.
+// In Node.js test environment where IDB is unavailable, returns empty array.
+export async function getTasksByProjectId(projectId) {
+  const database = await getDatabase();
+  if (!database) return [];
+  const tasks = await database.getAll('tasks');
+  return (tasks || []).filter(task => task.projectId === projectId);
+}
+
+// Save a task to IDB. Fire-and-forget; errors logged to console.
+// In Node.js test environment where IDB is unavailable, returns immediately.
+export async function putTask(task) {
+  const database = await getDatabase();
+  if (!database) return;
+
+  try {
+    await database.put('tasks', task);
+  } catch (error) {
+    console.error(`Failed to persist task ${task.id}:`, error.message);
+  }
+}
+
+// Delete a task from IDB. Fire-and-forget; errors logged to console.
+// In Node.js test environment where IDB is unavailable, returns immediately.
+export async function deleteTask(id) {
+  const database = await getDatabase();
+  if (!database) return;
+
+  try {
+    await database.delete('tasks', id);
+  } catch (error) {
+    console.error(`Failed to delete task ${id}:`, error.message);
   }
 }
 
