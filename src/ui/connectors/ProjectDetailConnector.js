@@ -42,6 +42,9 @@ export function initProjectDetailConnector(containerSelector, state) {
         onUnarchive: () => {
           dispatch({ type: 'UNARCHIVE_PROJECT', payload: { projectId: project.id } });
         },
+        onToggleFunded: () => {
+          dispatch({ type: 'TOGGLE_FUNDED', payload: { projectId: project.id } });
+        },
         onDelete: () => {
           dispatch({ type: 'DELETE_PROJECT', payload: { projectId: project.id } });
           navigateToList();

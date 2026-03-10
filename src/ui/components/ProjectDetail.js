@@ -1,6 +1,6 @@
 import { html } from 'https://unpkg.com/lit-html@2/lit-html.js';
 
-export function ProjectDetail({ project, onNameChange, onDescriptionChange, onArchive, onUnarchive, onDelete }) {
+export function ProjectDetail({ project, onNameChange, onDescriptionChange, onArchive, onUnarchive, onToggleFunded, onDelete }) {
   if (!project) return html``;
 
   const isArchived = project.archived;
@@ -19,6 +19,10 @@ export function ProjectDetail({ project, onNameChange, onDescriptionChange, onAr
 
   function handleUnarchive() {
     onUnarchive();
+  }
+
+  function handleToggleFunded() {
+    onToggleFunded();
   }
 
   function handleDelete() {
@@ -40,6 +44,15 @@ export function ProjectDetail({ project, onNameChange, onDescriptionChange, onAr
             @change=${handleNameChange}
           />
           <span class="project-detail__edit-icon" aria-hidden="true">✎</span>
+          <input
+            class="project-detail__funded-checkbox"
+            type="checkbox"
+            aria-label="Mark project as funded"
+            ?checked=${project.funded}
+            ?disabled=${isArchived}
+            @change=${handleToggleFunded}
+          />
+          <span class="project-detail__funded-icon" aria-hidden="true">⭐</span>
         </div>
         <div class="project-detail__button-group">
           ${isArchived
