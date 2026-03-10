@@ -1,7 +1,9 @@
 import { html } from 'https://unpkg.com/lit-html@2/lit-html.js';
 
-export function ProjectDetail({ project, onNameChange, onDescriptionChange, onArchive, onDelete }) {
+export function ProjectDetail({ project, onNameChange, onDescriptionChange, onArchive, onUnarchive, onDelete }) {
   if (!project) return html``;
+
+  const isArchived = project.archived;
 
   function handleNameChange(event) {
     onNameChange(event.target.value);
@@ -13,6 +15,10 @@ export function ProjectDetail({ project, onNameChange, onDescriptionChange, onAr
 
   function handleArchive() {
     onArchive();
+  }
+
+  function handleUnarchive() {
+    onUnarchive();
   }
 
   function handleDelete() {
@@ -30,14 +36,24 @@ export function ProjectDetail({ project, onNameChange, onDescriptionChange, onAr
             type="text"
             aria-label="Project name"
             value=${project.name}
+            ?disabled=${isArchived}
             @change=${handleNameChange}
           />
           <span class="project-detail__edit-icon" aria-hidden="true">✎</span>
         </div>
         <div class="project-detail__button-group">
-          <button class="project-detail__archive-button" @click=${handleArchive}>
-            Archive
-          </button>
+          ${isArchived
+            ? html`
+              <button class="project-detail__unarchive-button" @click=${handleUnarchive}>
+                Unarchive
+              </button>
+            `
+            : html`
+              <button class="project-detail__archive-button" @click=${handleArchive}>
+                Archive
+              </button>
+            `
+          }
           <button class="project-detail__delete-button" @click=${handleDelete}>
             Delete
           </button>
@@ -49,6 +65,7 @@ export function ProjectDetail({ project, onNameChange, onDescriptionChange, onAr
         <textarea
           class="project-detail__description"
           placeholder="Enter project description..."
+          ?disabled=${isArchived}
           @change=${handleDescriptionChange}
           .value=${project.description}
         ></textarea>
