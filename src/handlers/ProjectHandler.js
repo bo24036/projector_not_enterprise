@@ -19,20 +19,15 @@ registerHandler('SELECT_PROJECT', (state, action) => {
   // Update state immediately to switch to project page
   const nextState = { ...state, currentPage: 'project', currentProjectId: projectId };
 
-  // Queue effect to check if project is archived and auto-expand if needed
-  const effect = async () => {
-    try {
-      const project = await Project.getProjectAsync(projectId);
-      if (project?.archived && !state.showArchivedProjects) {
-        // Project is archived and archived section is not shown; expand it
-        dispatch({ type: 'TOGGLE_ARCHIVED_PROJECTS' });
-      }
-    } catch (error) {
-      console.error('Failed to check project archived status:', error.message);
-    }
-  };
+  // Check if project is archived and auto-expand archived section if needed
+  // Project is guaranteed to be in cache from startup load
+  const project = Project.getProject(projectId);
+  if (project?.archived && !state.showArchivedProjects) {
+    // Project is archived and archived section is not shown; expand it
+    dispatch({ type: 'TOGGLE_ARCHIVED_PROJECTS' });
+  }
 
-  return { state: nextState, effects: [effect] };
+  return { state: nextState };
 });
 
 registerHandler('SELECT_OVERVIEW', (state) => {
@@ -109,11 +104,11 @@ registerHandler('TOGGLE_FUNDED', (state, action) => {
   return { state };
 });
 
-registerHandler('START_CREATE_PROJECT', (state, action) => {
+registerHandler('START_CREATE_PROJECT', (state) => {
   return { state: { ...state, isCreatingProject: true } };
 });
 
-registerHandler('CANCEL_CREATE_PROJECT', (state, action) => {
+registerHandler('CANCEL_CREATE_PROJECT', (state) => {
   return { state: { ...state, isCreatingProject: false } };
 });
 

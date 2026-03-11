@@ -1,12 +1,8 @@
-// Import dispatch from local module (always available)
-import { dispatch } from '../state.js';
-
 // Import IDB operations from service layer (isolates persistence I/O)
-import { getProject as getProjectFromIdb, getAllProjects as getAllProjectsFromIdb, putProject as putProjectToIdb, deleteProject as deleteProjectFromIdb } from '../services/IdbService.js';
+import { getAllProjects as getAllProjectsFromIdb, putProject as putProjectToIdb, deleteProject as deleteProjectFromIdb } from '../services/IdbService.js';
 
 const projectCache = new Map();
 const writeQueue = new Map(); // Tracks queued IDs to prevent concurrent writes
-const fetchQueue = new Set(); // Tracks IDs currently being fetched (prevents duplicate fetches)
 let projectsLoaded = false; // Tracks if we've already fetched all projects from IDB
 
 const ERROR_PROJECT_NOT_FOUND = 'Project not found';
@@ -80,141 +76,37 @@ export function createProject(overrides = {}) {
 }
 
 export function getProject(id) {
-  const cached = projectCache.get(id);
-  if (cached !== undefined) {
-    return cached;
-  }
-
-  // Cache miss: queue async fetch from IDB (fire-and-forget)
-  if (!fetchQueue.has(id)) {
-    fetchQueue.add(id);
-    queueMicrotask(async () => {
-      try {
-        const project = await getProjectFromIdb(id);
-        if (project) {
-          // Populate cache
-          projectCache.set(id, project);
-          // Dispatch fulfillment action to trigger re-render
-          if (dispatch) {
-            dispatch({ type: 'PROJECT_LOADED', payload: { project } });
-          }
-        }
-      } catch (error) {
-        console.error(`Failed to fetch project ${id}:`, error.message);
-      } finally {
-        fetchQueue.delete(id);
-      }
-    });
-  }
-
-  return undefined;
+  // All projects are pre-loaded in cache at startup via getAllProjectsAsync()
+  // This is now a simple synchronous cache lookup
+  return projectCache.get(id);
 }
 
 export function getAllProjects() {
-  // If already fetched, return sorted cache; if fetch in progress, return empty
-  if (projectsLoaded) {
-    return Array.from(projectCache.values()).sort((a, b) => a.createdAt.localeCompare(b.createdAt));
-  }
-
-  const cached = Array.from(projectCache.values()).sort((a, b) => a.createdAt.localeCompare(b.createdAt));
-  if (cached.length > 0) {
-    return cached;
-  }
-
-  // Cache miss: queue async fetch of all projects from IDB
-  projectsLoaded = true;
-  queueMicrotask(async () => {
-    try {
-      const allProjects = await getAllProjectsFromIdb();
-      if (allProjects && allProjects.length > 0) {
-        allProjects.forEach(project => projectCache.set(project.id, project));
-        if (dispatch) {
-          dispatch({ type: 'PROJECTS_LOADED', payload: { projects: allProjects } });
-        }
-      }
-    } catch (error) {
-      console.error('Failed to fetch all projects:', error.message);
-    }
-  });
-
-  return cached;
+  // Return all projects from the in-memory cache, sorted by creation date
+  // Cache is pre-populated at app startup via getAllProjectsAsync()
+  return Array.from(projectCache.values()).sort((a, b) => a.createdAt.localeCompare(b.createdAt));
 }
 
-// Async versions for effects to await
-// These return promises that resolve with the entity once it's available in cache
-
-export async function getProjectAsync(id) {
-  // If in cache, return immediately
-  let cached = projectCache.get(id);
-  if (cached !== undefined) {
-    return cached;
-  }
-
-  // Not in cache: wait for fetch to complete
-  return new Promise((resolve) => {
-    if (!fetchQueue.has(id)) {
-      fetchQueue.add(id);
-      queueMicrotask(async () => {
-        try {
-          const project = await getProjectFromIdb(id);
-          if (project) {
-            projectCache.set(id, project);
-            if (dispatch) {
-              dispatch({ type: 'PROJECT_LOADED', payload: { project } });
-            }
-          }
-          resolve(project || null);
-        } catch (error) {
-          console.error(`Failed to fetch project ${id}:`, error.message);
-          resolve(null);
-        } finally {
-          fetchQueue.delete(id);
-        }
-      });
-    } else {
-      // Already fetching; poll cache until available
-      const checkCache = setInterval(() => {
-        const found = projectCache.get(id);
-        if (found !== undefined) {
-          clearInterval(checkCache);
-          resolve(found);
-        }
-      }, 10);
-    }
-  });
-}
-
+// Eager-load all projects from IDB into the in-memory cache
+// Called at app startup before router initialization
+// Returns promise that resolves once cache is populated
 export async function getAllProjectsAsync() {
-  // If already fetched, return immediately
   if (projectsLoaded) {
     return Array.from(projectCache.values()).sort((a, b) => a.createdAt.localeCompare(b.createdAt));
   }
 
-  // Return current cache if non-empty (partial load)
-  const cached = Array.from(projectCache.values()).sort((a, b) => a.createdAt.localeCompare(b.createdAt));
-  if (cached.length > 0) {
-    return cached;
-  }
+  projectsLoaded = true;
 
-  // Cache miss: wait for fetch to complete
-  return new Promise((resolve) => {
-    projectsLoaded = true;
-    queueMicrotask(async () => {
-      try {
-        const allProjects = await getAllProjectsFromIdb();
-        if (allProjects && allProjects.length > 0) {
-          allProjects.forEach(project => projectCache.set(project.id, project));
-          if (dispatch) {
-            dispatch({ type: 'PROJECTS_LOADED', payload: { projects: allProjects } });
-          }
-        }
-        resolve(allProjects || []);
-      } catch (error) {
-        console.error('Failed to fetch all projects:', error.message);
-        resolve([]);
-      }
-    });
-  });
+  try {
+    const allProjects = await getAllProjectsFromIdb();
+    if (allProjects && allProjects.length > 0) {
+      allProjects.forEach(project => projectCache.set(project.id, project));
+    }
+    return allProjects || [];
+  } catch (error) {
+    console.error('Failed to fetch all projects:', error.message);
+    return [];
+  }
 }
 
 export function renameProject(id, newName) {
