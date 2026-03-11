@@ -79,6 +79,7 @@ export async function getAllProjectsAsync() {
     return allProjects || [];
   } catch (error) {
     console.error('Failed to fetch all projects:', error.message);
+    projectsLoaded = false;
     return [];
   }
 }
