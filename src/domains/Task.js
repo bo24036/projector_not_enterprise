@@ -2,7 +2,7 @@
 import { dispatch } from '../state.js';
 
 // Import IDB operations from service layer
-import { getTask as getTaskFromIdb, getTasksByProjectId as getTasksByProjectIdFromIdb, putTask as putTaskToIdb, deleteTask as deleteTaskFromIdb } from '../services/IdbService.js';
+import { getTask as getTaskFromIdb, getTasksByProjectId as getTasksByProjectIdFromIdb, getPersonalTasksFromIdb, putTask as putTaskToIdb, deleteTask as deleteTaskFromIdb } from '../services/IdbService.js';
 import { createPersistenceQueue } from '../utils/PersistenceQueue.js';
 
 const taskCache = new Map();
@@ -170,7 +170,7 @@ export function createTask(projectId, name, dueDateInput) {
   const task = {
     id: generateId(),
     name: taskName,
-    projectId,
+    projectId: projectId ?? null,
     completed: false,
     dueDate,
     parentTaskId: null,
@@ -258,6 +258,10 @@ export function getTasksByProjectId(projectId) {
     if (b.dueDate) return 1;
     return a.createdAt.localeCompare(b.createdAt);
   });
+}
+
+export function getPersonalTasks() {
+  return getTasksByProjectId(null);
 }
 
 export function updateTask(id, updates) {

@@ -97,6 +97,15 @@ export async function getTasksByProjectId(projectId) {
   return (tasks || []).filter(task => task.projectId === projectId);
 }
 
+// Fetch all personal tasks (projectId: null) from IDB. Returns empty array if none exist.
+// In Node.js test environment where IDB is unavailable, returns empty array.
+export async function getPersonalTasksFromIdb() {
+  const database = await getDatabase();
+  if (!database) return [];
+  const tasks = await database.getAll('tasks');
+  return (tasks || []).filter(task => task.projectId === null);
+}
+
 // Save a task to IDB. Fire-and-forget; errors logged to console.
 // In Node.js test environment where IDB is unavailable, returns immediately.
 export async function putTask(task) {
