@@ -4,7 +4,7 @@ import { ProjectNewItem } from '../components/ProjectNewItem.js';
 import { ProjectInput } from '../components/ProjectInput.js';
 import * as Project from '../../domains/Project.js';
 import { dispatch } from '../../state.js';
-import { navigateToProject, navigateToOverview } from '../../utils/router.js';
+import { navigateToProject, navigateToOverview, navigateToPersonal } from '../../utils/router.js';
 
 export function initSidebarConnector(containerSelector, state) {
   const container = document.querySelector(containerSelector);
@@ -49,6 +49,10 @@ export function initSidebarConnector(containerSelector, state) {
 
       <button class="sidebar__overview-btn ${state.currentPage === 'overview' ? 'is-active' : ''}" @click=${navigateToOverview}>
         Overview
+      </button>
+
+      <button class="sidebar__personal-btn ${state.currentPage === 'personal' ? 'is-active' : ''}" @click=${navigateToPersonal}>
+        My Tasks
       </button>
 
       <div class="sidebar__list">
