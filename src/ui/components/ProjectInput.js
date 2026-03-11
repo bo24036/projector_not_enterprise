@@ -1,26 +1,23 @@
 import { html } from 'https://unpkg.com/lit-html@2/lit-html.js';
+import { makeKeyDownHandler, makeBlurHandler } from '../../utils/inputHandlers.js';
 
 export function ProjectInput({ onSave, onCancel }) {
   let inputValue = '';
 
-  function handleKeyDown(event) {
-    if (event.key === 'Enter') {
-      if (inputValue.trim()) {
-        onSave(inputValue.trim());
-      }
-    } else if (event.key === 'Escape') {
-      onCancel();
-    }
-  }
+  const handleKeyDown = makeKeyDownHandler({
+    primaryFieldGetter: () => inputValue,
+    fieldValuesGetter: () => [inputValue.trim()],
+    onSave,
+    onCancel,
+  });
+
+  const handleBlur = makeBlurHandler({
+    primaryFieldGetter: () => inputValue,
+    onCancel,
+  });
 
   function handleInput(event) {
     inputValue = event.target.value;
-  }
-
-  function handleBlur() {
-    if (!inputValue.trim()) {
-      onCancel();
-    }
   }
 
   return html`

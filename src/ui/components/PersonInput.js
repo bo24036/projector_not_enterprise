@@ -1,18 +1,22 @@
 import { html } from 'https://unpkg.com/lit-html@2/lit-html.js';
+import { makeKeyDownHandler, makeBlurHandler } from '../../utils/inputHandlers.js';
 
 export function PersonInput({ onSave, onCancel, nameOptions = [], roleOptions = [] }) {
   let nameValue = '';
   let roleValue = '';
 
-  function handleKeyDown(event) {
-    if (event.key === 'Enter') {
-      if (nameValue.trim()) {
-        onSave(nameValue.trim(), roleValue.trim());
-      }
-    } else if (event.key === 'Escape') {
-      onCancel();
-    }
-  }
+  const handleKeyDown = makeKeyDownHandler({
+    primaryFieldGetter: () => nameValue,
+    fieldValuesGetter: () => [nameValue.trim(), roleValue.trim()],
+    onSave,
+    onCancel,
+  });
+
+  const handleBlur = makeBlurHandler({
+    primaryFieldGetter: () => nameValue,
+    onCancel,
+    itemSelector: '.person-list-item',
+  });
 
   function handleNameInput(event) {
     nameValue = event.target.value;
@@ -20,20 +24,6 @@ export function PersonInput({ onSave, onCancel, nameOptions = [], roleOptions = 
 
   function handleRoleInput(event) {
     roleValue = event.target.value;
-  }
-
-  function handleBlur(event) {
-    // If focus is moving to another element within this person item, don't cancel
-    if (event.relatedTarget) {
-      const personItem = event.currentTarget.closest('.person-list-item');
-      if (personItem && personItem.contains(event.relatedTarget)) {
-        return;
-      }
-    }
-    // Only cancel if user truly left the form
-    if (!nameValue.trim()) {
-      onCancel();
-    }
   }
 
   const nameListId = `person-names-list-${Math.random().toString(36).substr(2, 9)}`;

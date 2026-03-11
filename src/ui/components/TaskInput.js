@@ -1,18 +1,22 @@
 import { html } from 'https://unpkg.com/lit-html@2/lit-html.js';
+import { makeKeyDownHandler, makeBlurHandler } from '../../utils/inputHandlers.js';
 
 export function TaskInput({ onSave, onCancel }) {
   let nameValue = '';
   let dueDateValue = '';
 
-  function handleKeyDown(event) {
-    if (event.key === 'Enter') {
-      if (nameValue.trim()) {
-        onSave(nameValue.trim(), dueDateValue.trim());
-      }
-    } else if (event.key === 'Escape') {
-      onCancel();
-    }
-  }
+  const handleKeyDown = makeKeyDownHandler({
+    primaryFieldGetter: () => nameValue,
+    fieldValuesGetter: () => [nameValue.trim(), dueDateValue.trim()],
+    onSave,
+    onCancel,
+  });
+
+  const handleBlur = makeBlurHandler({
+    primaryFieldGetter: () => nameValue,
+    onCancel,
+    itemSelector: '.task-list-item',
+  });
 
   function handleNameInput(event) {
     nameValue = event.target.value;
@@ -20,20 +24,6 @@ export function TaskInput({ onSave, onCancel }) {
 
   function handleDueDateInput(event) {
     dueDateValue = event.target.value;
-  }
-
-  function handleBlur(event) {
-    // If focus is moving to another element within this task item, don't cancel
-    if (event.relatedTarget) {
-      const taskItem = event.currentTarget.closest('.task-list-item');
-      if (taskItem && taskItem.contains(event.relatedTarget)) {
-        return;
-      }
-    }
-    // Only cancel if user truly left the task form
-    if (!nameValue.trim()) {
-      onCancel();
-    }
   }
 
   return html`
