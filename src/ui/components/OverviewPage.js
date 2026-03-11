@@ -16,13 +16,14 @@ export function OverviewPage({ personalTasks = [], projects }) {
     <div class="overview-page">
       <h1 class="overview-page__title">Overview</h1>
 
-      ${personalTasks.length > 0 ? html`
-        <div class="overview-personal">
-          <div class="overview-personal__header">
-            <h3 class="overview-personal__name">My Tasks</h3>
-          </div>
-          <div class="overview-personal__tasks">
-            ${personalTasks.map(({ task, dueDateFormatted, urgency, onToggle }) => {
+      <div class="overview-personal">
+        <div class="overview-personal__header">
+          <h3 class="overview-personal__name">My Tasks</h3>
+        </div>
+        <div class="overview-personal__tasks">
+          ${personalTasks.length === 0
+            ? html`<div class="overview-project__no-tasks">No incomplete tasks</div>`
+            : personalTasks.map(({ task, dueDateFormatted, urgency, onToggle }) => {
               const completedClass = task.completed ? 'is-completed' : '';
 
               return html`
@@ -39,10 +40,10 @@ export function OverviewPage({ personalTasks = [], projects }) {
                     : ''}
                 </div>
               `;
-            })}
-          </div>
+            })
+          }
         </div>
-      ` : ''}
+      </div>
 
       ${projects.map(({ project, incompleteTasks, onProjectClick }) => html`
         <div class="overview-project">

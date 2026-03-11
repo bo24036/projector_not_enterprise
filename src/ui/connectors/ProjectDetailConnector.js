@@ -59,6 +59,11 @@ export function initProjectDetailConnector(containerSelector, state) {
         },
       })}
 
+      <div class="project-detail__tasks-section">
+        <h3 class="project-detail__section-title">Tasks</h3>
+        ${TaskListConnector({ projectId: project.id, state })}
+      </div>
+
       <div class="project-detail__people-section">
         <h3 class="project-detail__section-title">People</h3>
         <div class="project-detail__people">
@@ -89,11 +94,6 @@ export function initProjectDetailConnector(containerSelector, state) {
               })
           }
         </div>
-      </div>
-
-      <div class="project-detail__tasks-section">
-        <h3 class="project-detail__section-title">Tasks</h3>
-        ${TaskListConnector({ projectId: project.id, state })}
       </div>
     </div>
   `;
