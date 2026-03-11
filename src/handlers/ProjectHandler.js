@@ -6,10 +6,10 @@ registerHandler('CREATE_PROJECT', (state, action) => {
 
   try {
     const project = Project.createProject({ name });
-    return { state: { ...state, currentProjectId: project.id, isCreatingProject: false } };
+    return { state: { currentProjectId: project.id, isCreatingProject: false } };
   } catch (error) {
     alert(error.message);
-    return { state };
+    return { state: {} };
   }
 });
 
@@ -37,8 +37,8 @@ registerHandler('SELECT_PROJECT', (state, action) => {
   return { state: nextState, effects };
 });
 
-registerHandler('SELECT_OVERVIEW', (state) => {
-  return { state: { ...state, currentPage: 'overview', currentProjectId: null } };
+registerHandler('SELECT_OVERVIEW', () => {
+  return { state: { currentPage: 'overview', currentProjectId: null } };
 });
 
 registerHandler('RENAME_PROJECT', (state, action) => {
@@ -97,7 +97,7 @@ registerHandler('UNARCHIVE_PROJECT', (state, action) => {
 });
 
 registerHandler('TOGGLE_ARCHIVED_PROJECTS', (state) => {
-  return { state: { ...state, showArchivedProjects: !state.showArchivedProjects } };
+  return { state: { showArchivedProjects: !state.showArchivedProjects }, effects: [] };
 });
 
 registerHandler('TOGGLE_FUNDED', (state, action) => {
@@ -111,12 +111,12 @@ registerHandler('TOGGLE_FUNDED', (state, action) => {
   return { state };
 });
 
-registerHandler('START_CREATE_PROJECT', (state) => {
-  return { state: { ...state, isCreatingProject: true } };
+registerHandler('START_CREATE_PROJECT', () => {
+  return { state: { isCreatingProject: true } };
 });
 
-registerHandler('CANCEL_CREATE_PROJECT', (state) => {
-  return { state: { ...state, isCreatingProject: false } };
+registerHandler('CANCEL_CREATE_PROJECT', () => {
+  return { state: { isCreatingProject: false } };
 });
 
 registerHandler('PROJECT_LOADED', (state) => {
