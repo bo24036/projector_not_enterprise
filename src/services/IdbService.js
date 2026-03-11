@@ -24,13 +24,16 @@ async function getDatabase() {
 
   if (db) return db;
 
-  db = await openDB('projector', 2, {
+  db = await openDB('projector', 3, {
     upgrade(db) {
       if (!db.objectStoreNames.contains('projects')) {
         db.createObjectStore('projects', { keyPath: 'id' });
       }
       if (!db.objectStoreNames.contains('tasks')) {
         db.createObjectStore('tasks', { keyPath: 'id' });
+      }
+      if (!db.objectStoreNames.contains('people')) {
+        db.createObjectStore('people', { keyPath: 'id' });
       }
     },
   });
@@ -129,6 +132,58 @@ export async function deleteTask(id) {
     await database.delete('tasks', id);
   } catch (error) {
     console.error(`Failed to delete task ${id}:`, error.message);
+  }
+}
+
+// Fetch a single person from IDB. Returns undefined if not found.
+// In Node.js test environment where IDB is unavailable, returns undefined.
+export async function getPersonFromIdb(id) {
+  const database = await getDatabase();
+  if (!database) return undefined;
+  return database.get('people', id);
+}
+
+// Fetch all people for a project from IDB. Returns empty array if none exist.
+// In Node.js test environment where IDB is unavailable, returns empty array.
+export async function getPeopleByProjectIdFromIdb(projectId) {
+  const database = await getDatabase();
+  if (!database) return [];
+  const people = await database.getAll('people');
+  return (people || []).filter(person => person.projectId === projectId);
+}
+
+// Fetch all people from IDB for autocomplete. Returns empty array if none exist.
+// In Node.js test environment where IDB is unavailable, returns empty array.
+export async function getAllPeopleFromIdb() {
+  const database = await getDatabase();
+  if (!database) return [];
+  const people = await database.getAll('people');
+  return people || [];
+}
+
+// Save a person to IDB. Fire-and-forget; errors logged to console.
+// In Node.js test environment where IDB is unavailable, returns immediately.
+export async function putPersonToIdb(person) {
+  const database = await getDatabase();
+  if (!database) return;
+
+  try {
+    await database.put('people', person);
+  } catch (error) {
+    console.error(`Failed to persist person ${person.id}:`, error.message);
+  }
+}
+
+// Delete a person from IDB. Fire-and-forget; errors logged to console.
+// In Node.js test environment where IDB is unavailable, returns immediately.
+export async function deletePersonFromIdb(id) {
+  const database = await getDatabase();
+  if (!database) return;
+
+  try {
+    await database.delete('people', id);
+  } catch (error) {
+    console.error(`Failed to delete person ${id}:`, error.message);
   }
 }
 
