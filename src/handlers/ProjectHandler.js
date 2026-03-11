@@ -1,6 +1,6 @@
 import * as Project from '../domains/Project.js';
 import { registerHandler } from '../state.js';
-import { createToggleCreateHandler } from '../utils/handlerFactory.js';
+import { createToggleCreateHandler, createNoOpLoadedHandler } from '../utils/handlerFactory.js';
 
 // Factory for simple domain mutation handlers that return unchanged state
 function createMutationHandler(actionName, domainFn) {
@@ -81,14 +81,6 @@ createMutationHandler('TOGGLE_FUNDED', ({ projectId }) => {
 // Create START_CREATE_PROJECT and CANCEL_CREATE_PROJECT handlers
 createToggleCreateHandler('PROJECT', 'isCreatingProject');
 
-registerHandler('PROJECT_LOADED', (state) => {
-  // Project is already in cache from domain's cache-miss fetch.
-  // This handler just triggers a re-render via setState.
-  return { state };
-});
-
-registerHandler('PROJECTS_LOADED', (state) => {
-  // All projects are already in cache from domain's fetch-all.
-  // This handler just triggers a re-render via setState.
-  return { state };
-});
+// Create no-op handlers that trigger re-renders when projects are loaded
+createNoOpLoadedHandler('PROJECT_LOADED');
+createNoOpLoadedHandler('PROJECTS_LOADED');

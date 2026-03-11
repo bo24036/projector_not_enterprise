@@ -1,6 +1,6 @@
 import * as Person from '../domains/Person.js';
 import { registerHandler } from '../state.js';
-import { createToggleCreateHandler, createEditHandlers } from '../utils/handlerFactory.js';
+import { createToggleCreateHandler, createEditHandlers, createNoOpLoadedHandler } from '../utils/handlerFactory.js';
 
 registerHandler('CREATE_PERSON', (state, action) => {
   const { projectId, name, role } = action.payload;
@@ -56,8 +56,5 @@ createEditHandlers('PERSON', {
   }),
 });
 
-registerHandler('PERSON_LOADED', (state) => {
-  // Person is already in cache from domain's cache-miss fetch.
-  // This handler just triggers a re-render via setState.
-  return { state };
-});
+// Create no-op handler that triggers re-render when person is loaded
+createNoOpLoadedHandler('PERSON_LOADED');

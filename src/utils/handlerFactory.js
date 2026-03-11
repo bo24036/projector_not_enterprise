@@ -83,3 +83,20 @@ export function createEditHandlers(entityType, config) {
     return { state: { ...state, ...resetState } };
   });
 }
+
+/**
+ * Creates a no-op fulfillment handler that passes state unchanged.
+ * Used for data-load handlers where the domain cache is already updated;
+ * the handler exists only to trigger a re-render via setState.
+ *
+ * @param {string} actionType - Action type name (e.g., 'TASK_LOADED', 'PROJECTS_LOADED')
+ *
+ * @example
+ * createNoOpLoadedHandler('TASK_LOADED');
+ * // Registers: a handler that receives (state) => { state }
+ */
+export function createNoOpLoadedHandler(actionType) {
+  registerHandler(actionType, (state) => {
+    return { state };
+  });
+}

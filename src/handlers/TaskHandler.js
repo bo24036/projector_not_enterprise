@@ -1,6 +1,6 @@
 import * as Task from '../domains/Task.js';
 import { registerHandler } from '../state.js';
-import { createToggleCreateHandler, createEditHandlers } from '../utils/handlerFactory.js';
+import { createToggleCreateHandler, createEditHandlers, createNoOpLoadedHandler } from '../utils/handlerFactory.js';
 
 registerHandler('CREATE_TASK', (state, action) => {
   const { projectId, name, dueDate } = action.payload;
@@ -68,18 +68,10 @@ createEditHandlers('TASK', {
   }),
 });
 
-registerHandler('TASK_LOADED', (state) => {
-  // Task is already in cache from domain's cache-miss fetch.
-  // This handler just triggers a re-render via setState.
-  return { state };
-});
+// Create no-op handlers that trigger re-renders when data is loaded
+createNoOpLoadedHandler('TASK_LOADED');
+createNoOpLoadedHandler('PERSONAL_TASKS_LOADED');
 
 registerHandler('SELECT_PERSONAL_TASKS', (state) => {
   return { state: { ...state, currentPage: 'personal', currentProjectId: null } };
-});
-
-registerHandler('PERSONAL_TASKS_LOADED', (state) => {
-  // Personal tasks are already in cache from domain's cache-miss fetch.
-  // This handler just triggers a re-render via setState.
-  return { state };
 });
