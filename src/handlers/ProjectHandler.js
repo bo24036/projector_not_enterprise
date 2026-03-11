@@ -15,19 +15,26 @@ registerHandler('CREATE_PROJECT', (state, action) => {
 
 registerHandler('SELECT_PROJECT', (state, action) => {
   const { projectId } = action.payload;
+  console.log('[SELECT_PROJECT] handler running, projectId:', projectId);
 
   // Update state immediately to switch to project page
   const nextState = { ...state, currentPage: 'project', currentProjectId: projectId };
+  console.log('[SELECT_PROJECT] nextState:', { currentPage: nextState.currentPage, currentProjectId: nextState.currentProjectId });
 
   // Check if project is archived and auto-expand archived section if needed
-  // Project is guaranteed to be in cache from startup load
+  // Return as effect to avoid batching issues with synchronous dispatch
   const project = Project.getProject(projectId);
+  const effects = [];
   if (project?.archived && !state.showArchivedProjects) {
     // Project is archived and archived section is not shown; expand it
-    dispatch({ type: 'TOGGLE_ARCHIVED_PROJECTS' });
+    console.log('[SELECT_PROJECT] Project is archived, queueing TOGGLE effect');
+    effects.push(() => {
+      console.log('[SELECT_PROJECT] Effect running, dispatching TOGGLE_ARCHIVED_PROJECTS');
+      dispatch({ type: 'TOGGLE_ARCHIVED_PROJECTS' });
+    });
   }
 
-  return { state: nextState };
+  return { state: nextState, effects };
 });
 
 registerHandler('SELECT_OVERVIEW', (state) => {

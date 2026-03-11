@@ -7,9 +7,11 @@ export function initRouter() {
 
 function handleRouteChange() {
   const hash = window.location.hash;
+  console.log('[router] handleRouteChange:', hash);
 
   // Parse #overview
   if (hash === '#overview') {
+    console.log('[router] Dispatching SELECT_OVERVIEW');
     dispatch({ type: 'SELECT_OVERVIEW' });
     return;
   }
@@ -18,12 +20,14 @@ function handleRouteChange() {
   if (hash.startsWith('#project/projectId/')) {
     const projectId = hash.replace('#project/projectId/', '');
     if (projectId) {
+      console.log('[router] Dispatching SELECT_PROJECT:', projectId);
       dispatch({ type: 'SELECT_PROJECT', payload: { projectId } });
       return;
     }
   }
 
   // Default to overview
+  console.log('[router] Defaulting to SELECT_OVERVIEW');
   dispatch({ type: 'SELECT_OVERVIEW' });
 }
 
