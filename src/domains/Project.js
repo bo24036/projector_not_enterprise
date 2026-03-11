@@ -1,8 +1,8 @@
 // Import IDB operations from service layer (isolates persistence I/O)
 import { getAllProjects as getAllProjectsFromIdb, putProject as putProjectToIdb, deleteProject as deleteProjectFromIdb } from '../services/IdbService.js';
+import { createPersistenceQueue } from '../utils/PersistenceQueue.js';
 
 const projectCache = new Map();
-const writeQueue = new Map(); // Tracks queued IDs to prevent concurrent writes
 let projectsLoaded = false; // Tracks if we've already fetched all projects from IDB
 
 const ERROR_PROJECT_NOT_FOUND = 'Project not found';
@@ -12,40 +12,14 @@ function generateId() {
   return 'proj_' + Math.random().toString(36).substring(2, 11) + Date.now().toString(36);
 }
 
-// Queue a write to IDB. If already queued, replaces the previous write.
-// This ensures deduplication: rapid mutations to the same ID result in one final write.
-// Delegates to IdbService; gracefully skips IDB if unavailable (Node.js test environment).
-function serialize(project, operation) {
-  const id = project.id;
-
-  // If this ID is already queued, just mark for requeue on completion
-  // The next microtask will handle the final state
-  if (writeQueue.has(id)) {
-    writeQueue.set(id, { project, operation });
-    return;
-  }
-
-  // Mark this ID as queued
-  writeQueue.set(id, { project, operation });
-
-  // Schedule the actual write as a microtask
-  queueMicrotask(async () => {
-    const queued = writeQueue.get(id);
-    if (!queued) return;
-
-    writeQueue.delete(id);
-
-    try {
-      if (queued.operation === 'delete') {
-        await deleteProjectFromIdb(queued.project.id);
-      } else {
-        await putProjectToIdb(queued.project);
-      }
-    } catch (error) {
-      console.error(`[Project.serialize] Error persisting project ${id}:`, error.message);
-    }
-  });
-}
+// Create persistence queue for write-through IDB operations
+const serialize = createPersistenceQueue(
+  {
+    put: putProjectToIdb,
+    delete: deleteProjectFromIdb,
+  },
+  'project'
+);
 
 export function createProject(overrides = {}) {
   const name = overrides.name?.trim() || '';

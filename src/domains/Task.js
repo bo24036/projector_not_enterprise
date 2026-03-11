@@ -3,10 +3,10 @@ import { dispatch } from '../state.js';
 
 // Import IDB operations from service layer
 import { getTask as getTaskFromIdb, getTasksByProjectId as getTasksByProjectIdFromIdb, putTask as putTaskToIdb, deleteTask as deleteTaskFromIdb } from '../services/IdbService.js';
+import { createPersistenceQueue } from '../utils/PersistenceQueue.js';
 
 const taskCache = new Map();
 const projectIdIndex = new Map(); // Map of projectId -> Set of taskIds
-const writeQueue = new Map();
 
 const ERROR_TASK_NOT_FOUND = 'Task not found';
 
@@ -21,34 +21,14 @@ function getNormalizedToday() {
   return new Date(now.getFullYear(), now.getMonth(), now.getDate());
 }
 
-// Queue a write to IDB with deduplication
-function serialize(task, operation) {
-  const id = task.id;
-
-  if (writeQueue.has(id)) {
-    writeQueue.set(id, { task, operation });
-    return;
-  }
-
-  writeQueue.set(id, { task, operation });
-
-  queueMicrotask(async () => {
-    const queued = writeQueue.get(id);
-    if (!queued) return;
-
-    writeQueue.delete(id);
-
-    try {
-      if (queued.operation === 'delete') {
-        await deleteTaskFromIdb(queued.task.id);
-      } else {
-        await putTaskToIdb(queued.task);
-      }
-    } catch (error) {
-      console.error(`[Task.serialize] Error persisting task ${id}:`, error.message);
-    }
-  });
-}
+// Create persistence queue for write-through IDB operations
+const serialize = createPersistenceQueue(
+  {
+    put: putTaskToIdb,
+    delete: deleteTaskFromIdb,
+  },
+  'task'
+);
 
 // Helper: add business days (Mon-Fri) to a date
 function addBusinessDays(startDate, businessDays) {
