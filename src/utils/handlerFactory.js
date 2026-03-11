@@ -23,3 +23,63 @@ export function createToggleCreateHandler(entityType, stateKey) {
     return { state: { ...state, [stateKey]: false } };
   });
 }
+
+/**
+ * Creates START_EDIT and CANCEL_EDIT handlers for an entity type.
+ * Automatically registers both handlers with naming convention:
+ * - START_EDIT_{entityType}
+ * - CANCEL_EDIT_{entityType}
+ *
+ * @param {string} entityType - Entity type (TASK, PERSON) for action names
+ * @param {object} config - Configuration object
+ * @param {function} config.getter - Domain getter function (e.g., Task.getTask)
+ * @param {string} config.idPayloadKey - Action payload key for the entity ID (e.g., 'taskId')
+ * @param {string} config.stateIdKey - State key for the entity ID (e.g., 'editingTaskId')
+ * @param {array} config.stateKeys - All state keys to clear on cancel (e.g., ['editingTaskId', 'editingTaskName', 'editingTaskDueDate'])
+ * @param {function} config.buildFieldState - Function that takes entity and returns object of state field updates
+ *
+ * @example
+ * createEditHandlers('TASK', {
+ *   getter: Task.getTask,
+ *   idPayloadKey: 'taskId',
+ *   stateIdKey: 'editingTaskId',
+ *   stateKeys: ['editingTaskId', 'editingTaskName', 'editingTaskDueDate'],
+ *   buildFieldState: (task) => ({
+ *     editingTaskName: task.name,
+ *     editingTaskDueDate: task.dueDate ? Task.formatDueDate(task.dueDate) : '',
+ *   }),
+ * });
+ * // Registers: START_EDIT_TASK and CANCEL_EDIT_TASK
+ */
+export function createEditHandlers(entityType, config) {
+  const { getter, idPayloadKey, stateIdKey, stateKeys, buildFieldState } = config;
+
+  registerHandler(`START_EDIT_${entityType}`, (state, action) => {
+    const id = action.payload[idPayloadKey];
+    const entity = getter(id);
+
+    if (!entity) {
+      console.error(`${entityType.toLowerCase()} not found: ${id}`);
+      return { state };
+    }
+
+    const fieldState = buildFieldState(entity);
+
+    return {
+      state: {
+        ...state,
+        [stateIdKey]: id,
+        ...fieldState,
+      },
+    };
+  });
+
+  const resetState = {};
+  stateKeys.forEach((key) => {
+    resetState[key] = null;
+  });
+
+  registerHandler(`CANCEL_EDIT_${entityType}`, (state) => {
+    return { state: { ...state, ...resetState } };
+  });
+}

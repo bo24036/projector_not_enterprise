@@ -1,6 +1,6 @@
 import * as Task from '../domains/Task.js';
 import { registerHandler } from '../state.js';
-import { createToggleCreateHandler } from '../utils/handlerFactory.js';
+import { createToggleCreateHandler, createEditHandlers } from '../utils/handlerFactory.js';
 
 registerHandler('CREATE_TASK', (state, action) => {
   const { projectId, name, dueDate } = action.payload;
@@ -56,27 +56,16 @@ registerHandler('TOGGLE_TASK_COMPLETED', (state, action) => {
 // Create START_CREATE_TASK and CANCEL_CREATE_TASK handlers
 createToggleCreateHandler('TASK', 'creatingTask');
 
-registerHandler('START_EDIT_TASK', (state, action) => {
-  const { taskId } = action.payload;
-  const task = Task.getTask(taskId);
-
-  if (!task) {
-    console.error(`Task not found: ${taskId}`);
-    return { state };
-  }
-
-  return {
-    state: {
-      ...state,
-      editingTaskId: taskId,
-      editingTaskName: task.name,
-      editingTaskDueDate: task.dueDate ? Task.formatDueDate(task.dueDate) : '',
-    },
-  };
-});
-
-registerHandler('CANCEL_EDIT_TASK', (state) => {
-  return { state: { ...state, editingTaskId: null, editingTaskName: '', editingTaskDueDate: '' } };
+// Create START_EDIT_TASK and CANCEL_EDIT_TASK handlers
+createEditHandlers('TASK', {
+  getter: Task.getTask,
+  idPayloadKey: 'taskId',
+  stateIdKey: 'editingTaskId',
+  stateKeys: ['editingTaskId', 'editingTaskName', 'editingTaskDueDate'],
+  buildFieldState: (task) => ({
+    editingTaskName: task.name,
+    editingTaskDueDate: task.dueDate ? Task.formatDueDate(task.dueDate) : '',
+  }),
 });
 
 registerHandler('TASK_LOADED', (state) => {

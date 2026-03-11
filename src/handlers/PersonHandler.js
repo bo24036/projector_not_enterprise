@@ -1,6 +1,6 @@
 import * as Person from '../domains/Person.js';
 import { registerHandler } from '../state.js';
-import { createToggleCreateHandler } from '../utils/handlerFactory.js';
+import { createToggleCreateHandler, createEditHandlers } from '../utils/handlerFactory.js';
 
 registerHandler('CREATE_PERSON', (state, action) => {
   const { projectId, name, role } = action.payload;
@@ -44,27 +44,16 @@ registerHandler('DELETE_PERSON', (state, action) => {
 // Create START_CREATE_PERSON and CANCEL_CREATE_PERSON handlers
 createToggleCreateHandler('PERSON', 'creatingPerson');
 
-registerHandler('START_EDIT_PERSON', (state, action) => {
-  const { personId } = action.payload;
-  const person = Person.getPerson(personId);
-
-  if (!person) {
-    console.error(`Person not found: ${personId}`);
-    return { state };
-  }
-
-  return {
-    state: {
-      ...state,
-      editingPersonId: personId,
-      editingPersonName: person.name,
-      editingPersonRole: person.role,
-    },
-  };
-});
-
-registerHandler('CANCEL_EDIT_PERSON', (state) => {
-  return { state: { ...state, editingPersonId: null, editingPersonName: '', editingPersonRole: '' } };
+// Create START_EDIT_PERSON and CANCEL_EDIT_PERSON handlers
+createEditHandlers('PERSON', {
+  getter: Person.getPerson,
+  idPayloadKey: 'personId',
+  stateIdKey: 'editingPersonId',
+  stateKeys: ['editingPersonId', 'editingPersonName', 'editingPersonRole'],
+  buildFieldState: (person) => ({
+    editingPersonName: person.name,
+    editingPersonRole: person.role,
+  }),
 });
 
 registerHandler('PERSON_LOADED', (state) => {
