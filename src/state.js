@@ -53,12 +53,20 @@ export function dispatch(action) {
     return;
   }
 
-  const { state: nextState, effects } = handler(state, action);
-  setState(nextState);
+  try {
+    const { state: nextState, effects } = handler(state, action);
+    setState(nextState);
 
-  effects?.forEach(effect => {
-    queueMicrotask(effect);
-  });
+    effects?.forEach(effect => {
+      queueMicrotask(effect);
+    });
+  } catch (error) {
+    console.error(`Handler error for action ${action.type}:`, error.message);
+    // Dispatch error action to allow UI to recover or notify user
+    if (handlers['HANDLER_ERROR']) {
+      dispatch({ type: 'HANDLER_ERROR', payload: { actionType: action.type, error: error.message } });
+    }
+  }
 }
 
 const handlers = {};
