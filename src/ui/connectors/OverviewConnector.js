@@ -3,6 +3,7 @@ import { OverviewPage } from '../components/OverviewPage.js';
 import * as Project from '../../domains/Project.js';
 import * as Task from '../../domains/Task.js';
 import { dispatch } from '../../state.js';
+import { navigateToProject } from '../../utils/router.js';
 
 export function initOverviewConnector(containerSelector, state) {
   const container = document.querySelector(containerSelector);
@@ -26,6 +27,9 @@ export function initOverviewConnector(containerSelector, state) {
     return {
       project,
       incompleteTasks,
+      onProjectClick: () => {
+        navigateToProject(project.id);
+      },
     };
   });
 

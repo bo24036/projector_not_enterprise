@@ -16,10 +16,12 @@ export function OverviewPage({ projects }) {
   return html`
     <div class="overview-page">
       <h1 class="overview-page__title">Overview</h1>
-      ${projects.map(({ project, incompleteTasks }) => html`
+      ${projects.map(({ project, incompleteTasks, onProjectClick }) => html`
         <div class="overview-project">
           <div class="overview-project__header">
-            <h3 class="overview-project__name">${project.name}</h3>
+            <h3 class="overview-project__name" @click=${onProjectClick} role="button" tabindex="0">
+              ${project.name}
+            </h3>
             ${project.funded ? html`<span class="overview-project__badge">Funded</span>` : ''}
           </div>
 

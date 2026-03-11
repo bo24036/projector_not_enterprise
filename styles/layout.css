@@ -536,6 +536,12 @@
   font-weight: var(--font-weight-bold);
   color: var(--color-text);
   margin: 0;
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.overview-project__name:hover {
+  color: var(--color-primary);
 }
 
 .overview-project__badge {
