@@ -658,3 +658,185 @@
 .overview-task.urgency-gray {
   border-left: 3px solid transparent;
 }
+
+/* People section */
+.project-detail__people-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.project-detail__people {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+/* Person list item (display view) */
+.person-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  transition: background-color var(--transition-fast);
+}
+
+.person-list-item:hover {
+  background-color: var(--color-surface-hover);
+}
+
+.person-list-item__content {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  flex: 1;
+  min-width: 0;
+}
+
+.person-list-item__name {
+  flex: 1;
+  min-width: 0;
+  word-break: break-word;
+  font-weight: var(--font-weight-medium);
+}
+
+.person-list-item__role {
+  flex-shrink: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  padding: 0 var(--spacing-xs);
+  border-radius: var(--border-radius-sm);
+  background-color: var(--color-background);
+}
+
+.person-list-item__actions {
+  display: flex;
+  gap: var(--spacing-xs);
+  flex-shrink: 0;
+}
+
+.person-list-item__edit,
+.person-list-item__delete {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: none;
+  border-radius: var(--border-radius-sm);
+  background-color: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+  font-size: var(--font-size-sm);
+  min-width: 28px;
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.person-list-item__edit:hover {
+  background-color: var(--color-primary-overlay-light);
+  color: var(--color-primary);
+}
+
+.person-list-item__delete:hover {
+  background-color: var(--color-error-overlay-light);
+  color: var(--color-error);
+}
+
+.person-list-item--placeholder {
+  padding: 0;
+  background-color: transparent;
+}
+
+.person-list-item--placeholder:hover {
+  background-color: transparent;
+}
+
+.person-list-item__placeholder-button {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: left;
+  border: none;
+  border-radius: var(--border-radius-md);
+  background-color: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-style: italic;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+  font-size: var(--font-size-sm);
+}
+
+.person-list-item__placeholder-button:hover {
+  background-color: var(--color-primary-overlay-light);
+  color: var(--color-text);
+}
+
+/* Person input (create/edit form) */
+.person-list-item--creating,
+.person-list-item--editing {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  background-color: var(--color-surface-hover);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-xs);
+}
+
+.person-input__field {
+  padding: var(--spacing-xs) var(--spacing-md);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  background-color: var(--color-background);
+  font-size: var(--font-size-sm);
+}
+
+.person-input__field--name {
+  flex: 1;
+  min-width: 0;
+}
+
+.person-input__field--role {
+  flex: 0 0 160px;
+}
+
+.person-input__controls {
+  display: flex;
+  gap: var(--spacing-2xs);
+  flex-shrink: 0;
+  padding-left: var(--spacing-sm);
+}
+
+.person-input__ok,
+.person-input__cancel {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  font-weight: var(--font-weight-medium);
+  transition: background-color var(--transition-fast);
+  font-size: var(--font-size-sm);
+  min-width: 32px;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+}
+
+.person-input__ok {
+  background-color: var(--color-success);
+  color: var(--color-text-light);
+}
+
+.person-input__ok:hover {
+  background-color: #45a049;
+}
+
+.person-input__cancel {
+  background-color: var(--color-error);
+  color: var(--color-text-light);
+}
+
+.person-input__cancel:hover {
+  background-color: #da190b;
+}
