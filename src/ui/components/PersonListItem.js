@@ -70,13 +70,13 @@ export function PersonListItem({ person, isEditing, editName, editRole, onEdit, 
         </datalist>
         <div class="person-input__controls">
           <button
-            class="person-input__ok"
+            class="button-ok"
             @click=${() => onSave(nameValue.trim(), roleValue.trim())}
             title="Save"
           >
             ✓
           </button>
-          <button class="person-input__cancel" @click=${onCancel} title="Cancel">
+          <button class="button-cancel" @click=${onCancel} title="Cancel">
             ✕
           </button>
         </div>

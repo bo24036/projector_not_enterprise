@@ -59,13 +59,13 @@ export function TaskListItem({ task, dueDateFormatted, urgency, isArchived, isEd
         />
         <div class="task-input__controls">
           <button
-            class="task-input__ok"
+            class="button-ok"
             @click=${() => onSave(nameValue.trim(), dueDateValue.trim())}
             title="Save"
           >
             ✓
           </button>
-          <button class="task-input__cancel" @click=${onCancel} title="Cancel">
+          <button class="button-cancel" @click=${onCancel} title="Cancel">
             ✕
           </button>
         </div>

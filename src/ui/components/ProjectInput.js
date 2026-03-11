@@ -35,10 +35,10 @@ export function ProjectInput({ onSave, onCancel }) {
         @blur=${handleBlur}
       />
       <div class="project-input__controls">
-        <button class="project-input__ok" @click=${() => onSave(inputValue.trim())} title="Save">
+        <button class="button-ok" @click=${() => onSave(inputValue.trim())} title="Save">
           ✓
         </button>
-        <button class="project-input__cancel" @click=${onCancel} title="Cancel">
+        <button class="button-cancel" @click=${onCancel} title="Cancel">
           ✕
         </button>
       </div>

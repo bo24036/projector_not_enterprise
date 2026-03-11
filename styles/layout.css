@@ -112,8 +112,9 @@
   padding-right: var(--spacing-md);
 }
 
-.project-input__ok,
-.project-input__cancel {
+/* Shared input control buttons (used by project, task, person inputs) */
+.button-ok,
+.button-cancel {
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--border-radius-sm);
   font-weight: var(--font-weight-medium);
@@ -124,24 +125,39 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  border: none;
+  cursor: pointer;
 }
 
-.project-input__ok {
+.button-ok {
   background-color: var(--color-success);
   color: var(--color-text-light);
 }
 
-.project-input__ok:hover {
+.button-ok:hover {
   background-color: #45a049;
 }
 
-.project-input__cancel {
+.button-cancel {
   background-color: var(--color-error);
   color: var(--color-text-light);
 }
 
-.project-input__cancel:hover {
+.button-cancel:hover {
   background-color: #da190b;
+}
+
+/* Legacy selectors for backwards compatibility (use .button-ok and .button-cancel instead) */
+.project-input__ok,
+.task-input__ok,
+.person-input__ok {
+  /* All styles inherited from .button-ok above */
+}
+
+.project-input__cancel,
+.task-input__cancel,
+.person-input__cancel {
+  /* All styles inherited from .button-cancel above */
 }
 
 /* Task list container */
@@ -301,39 +317,6 @@
   padding-left: var(--spacing-sm);
 }
 
-.task-input__ok,
-.task-input__cancel {
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--border-radius-sm);
-  font-weight: var(--font-weight-medium);
-  transition: background-color var(--transition-fast);
-  font-size: var(--font-size-sm);
-  min-width: 32px;
-  min-height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  cursor: pointer;
-}
-
-.task-input__ok {
-  background-color: var(--color-success);
-  color: var(--color-text-light);
-}
-
-.task-input__ok:hover {
-  background-color: #45a049;
-}
-
-.task-input__cancel {
-  background-color: var(--color-error);
-  color: var(--color-text-light);
-}
-
-.task-input__cancel:hover {
-  background-color: #da190b;
-}
 
 /* Task urgency color coding */
 .task-list-item.urgency-red {
@@ -807,36 +790,3 @@
   padding-left: var(--spacing-sm);
 }
 
-.person-input__ok,
-.person-input__cancel {
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--border-radius-sm);
-  font-weight: var(--font-weight-medium);
-  transition: background-color var(--transition-fast);
-  font-size: var(--font-size-sm);
-  min-width: 32px;
-  min-height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  cursor: pointer;
-}
-
-.person-input__ok {
-  background-color: var(--color-success);
-  color: var(--color-text-light);
-}
-
-.person-input__ok:hover {
-  background-color: #45a049;
-}
-
-.person-input__cancel {
-  background-color: var(--color-error);
-  color: var(--color-text-light);
-}
-
-.person-input__cancel:hover {
-  background-color: #da190b;
-}
