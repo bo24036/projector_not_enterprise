@@ -315,6 +315,36 @@ assert(pastTask.dueDate < getToday(), 'Past dates are parsed as negative delta')
 const numTask = Task.createTask(proj, 'Numeric', String(getDaysFromToday(5)));
 assert(numTask.dueDate === getDaysFromToday(5), 'Numeric timestamp strings are parsed correctly');
 
+// Personal Tasks Tests
+console.log('\n=== Personal Tasks ===');
+
+// Reset cache for clean test
+Task._resetCacheForTesting();
+
+// Test: createTask with null projectId creates personal task
+const personalTask1 = Task.createTask(null, 'Personal Task 1');
+assert(personalTask1.projectId === null, 'createTask with null projectId creates personal task');
+
+// Test: createTask with undefined projectId defaults to null
+const personalTask2 = Task.createTask(undefined, 'Personal Task 2');
+assert(personalTask2.projectId === null, 'createTask with undefined projectId defaults to null');
+
+// Test: getPersonalTasks returns personal tasks
+const personalTasks = Task.getPersonalTasks();
+assert(personalTasks.length === 2, 'getPersonalTasks returns personal tasks');
+assert(personalTasks.some(t => t.id === personalTask1.id), 'getPersonalTasks includes personalTask1');
+assert(personalTasks.some(t => t.id === personalTask2.id), 'getPersonalTasks includes personalTask2');
+
+// Test: getPersonalTasks does not return project tasks
+const projTask = Task.createTask('proj_abc', 'Project Task');
+const allPersonal = Task.getPersonalTasks();
+assert(!allPersonal.some(t => t.id === projTask.id), 'getPersonalTasks does not return project tasks');
+
+// Test: cache-miss sentinel works for null key
+Task._resetCacheForTesting();
+const missedPersonal = Task.getPersonalTasks();
+assert(missedPersonal.length === 0, 'getPersonalTasks returns empty array on cache miss');
+
 // Summary
 console.log('\n=== Test Summary ===');
 console.log(`✓ Passed: ${testsPassed}`);

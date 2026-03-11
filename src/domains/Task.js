@@ -166,11 +166,12 @@ export function createTask(projectId, name, dueDateInput) {
   }
 
   const dueDate = dueDateInput ? parseDueDate(dueDateInput) : null;
+  const normalizedProjectId = projectId ?? null;
 
   const task = {
     id: generateId(),
     name: taskName,
-    projectId: projectId ?? null,
+    projectId: normalizedProjectId,
     completed: false,
     dueDate,
     parentTaskId: null,
@@ -181,10 +182,10 @@ export function createTask(projectId, name, dueDateInput) {
   taskCache.set(task.id, task);
 
   // Index by projectId
-  if (!projectIdIndex.has(projectId)) {
-    projectIdIndex.set(projectId, new Set());
+  if (!projectIdIndex.has(normalizedProjectId)) {
+    projectIdIndex.set(normalizedProjectId, new Set());
   }
-  projectIdIndex.get(projectId).add(task.id);
+  projectIdIndex.get(normalizedProjectId).add(task.id);
 
   serialize(task, 'put');
   return task;
