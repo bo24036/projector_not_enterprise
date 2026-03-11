@@ -1,5 +1,6 @@
 import './handlers/ProjectHandler.js';
 import './handlers/TaskHandler.js';
+import './handlers/PersonHandler.js';
 import { initSidebarConnector } from './ui/connectors/SidebarConnector.js';
 import { initProjectDetailConnector } from './ui/connectors/ProjectDetailConnector.js';
 import { initOverviewConnector } from './ui/connectors/OverviewConnector.js';
@@ -8,6 +9,7 @@ import { initRouter } from './utils/router.js';
 import { getState, setRootRenderer } from './state.js';
 import { idbReady } from './services/IdbService.js';
 import * as Project from './domains/Project.js';
+import * as Person from './domains/Person.js';
 
 function renderApp() {
   const state = getState();
@@ -30,6 +32,10 @@ async function initApp() {
   // Pre-load all projects into cache before router initialization
   // This ensures projects are available synchronously for all handlers and connectors
   await Project.getAllProjectsAsync();
+
+  // Pre-load all people into cache for autocomplete
+  // This ensures people names/roles are available synchronously for autocomplete
+  await Person.preloadAllPeople();
 
   // Register root renderer before router init so initial navigation triggers render
   setRootRenderer(renderApp);
