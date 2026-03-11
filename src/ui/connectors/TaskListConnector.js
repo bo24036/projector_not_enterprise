@@ -2,9 +2,9 @@ import { html } from 'https://unpkg.com/lit-html@2/lit-html.js';
 import { TaskListItem } from '../components/TaskListItem.js';
 import { TaskInput } from '../components/TaskInput.js';
 import * as Task from '../../domains/Task.js';
-import { formatDueDate, getUrgency } from '../../domains/Task.js';
 import * as Project from '../../domains/Project.js';
 import { dispatch } from '../../state.js';
+import { makeTaskDisplayObject } from '../../utils/taskFormatting.js';
 
 export function TaskListConnector({ projectId, state }) {
   const tasks = Task.getTasksByProjectId(projectId);
@@ -16,11 +16,12 @@ export function TaskListConnector({ projectId, state }) {
     <div class="task-list">
       ${tasks.length > 0
         ? html`
-            ${tasks.map(task =>
-              TaskListItem({
+            ${tasks.map(task => {
+              const { dueDateFormatted, urgency } = makeTaskDisplayObject(task);
+              return TaskListItem({
                 task,
-                dueDateFormatted: formatDueDate(task.dueDate),
-                urgency: getUrgency(task.dueDate),
+                dueDateFormatted,
+                urgency,
                 isArchived,
                 isEditing: editingTaskId === task.id,
                 editName: editingTaskName,
@@ -43,8 +44,8 @@ export function TaskListConnector({ projectId, state }) {
                 onCancel: () => {
                   dispatch({ type: 'CANCEL_EDIT_TASK' });
                 },
-              })
-            )}
+              });
+            })}
           `
         : ''}
 

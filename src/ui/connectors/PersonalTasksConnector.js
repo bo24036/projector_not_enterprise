@@ -2,8 +2,8 @@ import { html, render } from 'https://unpkg.com/lit-html@2/lit-html.js';
 import { TaskListItem } from '../components/TaskListItem.js';
 import { TaskInput } from '../components/TaskInput.js';
 import * as Task from '../../domains/Task.js';
-import { formatDueDate, getUrgency } from '../../domains/Task.js';
 import { dispatch } from '../../state.js';
+import { makeTaskDisplayObject } from '../../utils/taskFormatting.js';
 
 export function initPersonalTasksConnector(containerSelector, state) {
   const container = document.querySelector(containerSelector);
@@ -17,11 +17,12 @@ export function initPersonalTasksConnector(containerSelector, state) {
       <h1 class="personal-tasks-page__title">My Tasks</h1>
 
       <div class="personal-tasks-page__tasks">
-        ${tasks.map(task =>
-          TaskListItem({
+        ${tasks.map(task => {
+          const { dueDateFormatted, urgency } = makeTaskDisplayObject(task);
+          return TaskListItem({
             task,
-            dueDateFormatted: formatDueDate(task.dueDate),
-            urgency: getUrgency(task.dueDate),
+            dueDateFormatted,
+            urgency,
             isArchived: false,
             isEditing: editingTaskId === task.id,
             editName: editingTaskName,
@@ -44,8 +45,8 @@ export function initPersonalTasksConnector(containerSelector, state) {
             onCancel: () => {
               dispatch({ type: 'CANCEL_EDIT_TASK' });
             },
-          })
-        )}
+          });
+        })}
 
         ${!creatingTask ? html`
           <div class="task-list-item task-list-item--placeholder">

@@ -2,9 +2,9 @@ import { html, render } from 'https://unpkg.com/lit-html@2/lit-html.js';
 import { OverviewPage } from '../components/OverviewPage.js';
 import * as Project from '../../domains/Project.js';
 import * as Task from '../../domains/Task.js';
-import { formatDueDate, getUrgency } from '../../domains/Task.js';
 import { dispatch } from '../../state.js';
 import { navigateToProject, navigateToPersonal } from '../../utils/router.js';
+import { makeTaskDisplayObject } from '../../utils/taskFormatting.js';
 
 export function initOverviewConnector(containerSelector, state) {
   const container = document.querySelector(containerSelector);
@@ -16,10 +16,7 @@ export function initOverviewConnector(containerSelector, state) {
   // Get personal tasks (incomplete only)
   const personalTasks = Task.getPersonalTasks()
     .filter(task => !task.completed)
-    .map(task => ({
-      task,
-      dueDateFormatted: formatDueDate(task.dueDate),
-      urgency: getUrgency(task.dueDate),
+    .map(task => makeTaskDisplayObject(task, {
       onToggle: () => {
         dispatch({ type: 'TOGGLE_TASK_COMPLETED', payload: { taskId: task.id } });
       },
@@ -30,10 +27,7 @@ export function initOverviewConnector(containerSelector, state) {
     const allTasks = Task.getTasksByProjectId(project.id) || [];
     const incompleteTasks = allTasks
       .filter(task => !task.completed)
-      .map(task => ({
-        task,
-        dueDateFormatted: formatDueDate(task.dueDate),
-        urgency: getUrgency(task.dueDate),
+      .map(task => makeTaskDisplayObject(task, {
         onToggle: () => {
           dispatch({ type: 'TOGGLE_TASK_COMPLETED', payload: { taskId: task.id } });
         },
