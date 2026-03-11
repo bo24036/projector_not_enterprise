@@ -14,6 +14,12 @@ function handleRouteChange() {
     return;
   }
 
+  // Parse #personal
+  if (hash === '#personal') {
+    dispatch({ type: 'SELECT_PERSONAL_TASKS' });
+    return;
+  }
+
   // Parse #project/projectId/{id} as per UI-SPEC
   if (hash.startsWith('#project/projectId/')) {
     const projectId = hash.replace('#project/projectId/', '');
@@ -29,6 +35,10 @@ function handleRouteChange() {
 
 export function navigateToProject(projectId) {
   window.location.hash = `#project/projectId/${projectId}`;
+}
+
+export function navigateToPersonal() {
+  window.location.hash = '#personal';
 }
 
 export function navigateToOverview() {
