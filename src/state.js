@@ -8,6 +8,10 @@ const state = {
   editingTaskId: null,
   editingTaskName: '',
   editingTaskDueDate: '',
+  creatingPerson: false,
+  editingPersonId: null,
+  editingPersonName: '',
+  editingPersonRole: '',
 };
 
 let renderScheduled = false;
