@@ -15,7 +15,11 @@ registerHandler('CREATE_PROJECT', (state, action) => {
 
 registerHandler('SELECT_PROJECT', (state, action) => {
   const { projectId } = action.payload;
-  return { state: { ...state, currentProjectId: projectId } };
+  return { state: { ...state, currentPage: 'project', currentProjectId: projectId } };
+});
+
+registerHandler('SELECT_OVERVIEW', (state) => {
+  return { state: { ...state, currentPage: 'overview', currentProjectId: null } };
 });
 
 registerHandler('RENAME_PROJECT', (state, action) => {

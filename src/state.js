@@ -1,4 +1,5 @@
 const state = {
+  currentPage: 'overview',
   currentProjectId: null,
   isCreatingProject: false,
   showArchivedProjects: false,

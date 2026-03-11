@@ -22,7 +22,15 @@ export function TaskInput({ onSave, onCancel }) {
     dueDateValue = event.target.value;
   }
 
-  function handleNameBlur() {
+  function handleBlur(event) {
+    // If focus is moving to another element within this task item, don't cancel
+    if (event.relatedTarget) {
+      const taskItem = event.currentTarget.closest('.task-list-item');
+      if (taskItem && taskItem.contains(event.relatedTarget)) {
+        return;
+      }
+    }
+    // Only cancel if user truly left the task form
     if (!nameValue.trim()) {
       onCancel();
     }
@@ -38,7 +46,7 @@ export function TaskInput({ onSave, onCancel }) {
         placeholder="[Click to add task...]"
         @input=${handleNameInput}
         @keydown=${handleKeyDown}
-        @blur=${handleNameBlur}
+        @blur=${handleBlur}
       />
       <input
         class="task-input__field task-input__field--due-date"
@@ -46,6 +54,7 @@ export function TaskInput({ onSave, onCancel }) {
         placeholder="Due date..."
         @input=${handleDueDateInput}
         @keydown=${handleKeyDown}
+        @blur=${handleBlur}
       />
       <div class="task-input__controls">
         <button

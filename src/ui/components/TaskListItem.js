@@ -1,7 +1,7 @@
 import { html } from 'https://unpkg.com/lit-html@2/lit-html.js';
 import { formatDueDate, getUrgency } from '../../domains/Task.js';
 
-export function TaskListItem({ task, isEditing, editName, editDueDate, onToggle, onEdit, onDelete, onSave, onCancel }) {
+export function TaskListItem({ task, isArchived, isEditing, editName, editDueDate, onToggle, onEdit, onDelete, onSave, onCancel }) {
   if (isEditing) {
     let nameValue = editName;
     let dueDateValue = editDueDate;
@@ -22,6 +22,20 @@ export function TaskListItem({ task, isEditing, editName, editDueDate, onToggle,
       dueDateValue = event.target.value;
     }
 
+    function handleBlur(event) {
+      // If focus is moving to another element within this task item, don't cancel
+      if (event.relatedTarget) {
+        const taskItem = event.currentTarget.closest('.task-list-item');
+        if (taskItem && taskItem.contains(event.relatedTarget)) {
+          return;
+        }
+      }
+      // Only cancel if user truly left the task form
+      if (!nameValue.trim()) {
+        onCancel();
+      }
+    }
+
     return html`
       <div class="task-list-item task-list-item--editing">
         <input
@@ -33,6 +47,7 @@ export function TaskListItem({ task, isEditing, editName, editDueDate, onToggle,
           .value=${nameValue}
           @input=${handleNameInput}
           @keydown=${handleKeyDown}
+          @blur=${handleBlur}
         />
         <input
           class="task-input__field task-input__field--due-date"
@@ -41,6 +56,7 @@ export function TaskListItem({ task, isEditing, editName, editDueDate, onToggle,
           .value=${dueDateValue}
           @input=${handleDueDateInput}
           @keydown=${handleKeyDown}
+          @blur=${handleBlur}
         />
         <div class="task-input__controls">
           <button
@@ -74,6 +90,7 @@ export function TaskListItem({ task, isEditing, editName, editDueDate, onToggle,
           type="checkbox"
           class="task-list-item__checkbox"
           ?checked=${task.completed}
+          ?disabled=${isArchived}
           @change=${() => onToggle()}
           title="${task.completed ? 'Mark incomplete' : 'Mark complete'}"
         />
@@ -82,14 +99,16 @@ export function TaskListItem({ task, isEditing, editName, editDueDate, onToggle,
           ? html`<span class="task-list-item__due-date">${dueDateFormatted}</span>`
           : ''}
       </div>
-      <div class="task-list-item__actions">
-        <button class="task-list-item__edit" @click=${onEdit} title="Edit">
-          ✎
-        </button>
-        <button class="task-list-item__delete" @click=${handleDelete} title="Delete">
-          ×
-        </button>
-      </div>
+      ${!isArchived ? html`
+        <div class="task-list-item__actions">
+          <button class="task-list-item__edit" @click=${onEdit} title="Edit">
+            ✎
+          </button>
+          <button class="task-list-item__delete" @click=${handleDelete} title="Delete">
+            ×
+          </button>
+        </div>
+      ` : ''}
     </div>
   `;
 }

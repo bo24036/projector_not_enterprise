@@ -8,6 +8,12 @@ export function initRouter() {
 function handleRouteChange() {
   const hash = window.location.hash;
 
+  // Parse #overview
+  if (hash === '#overview') {
+    dispatch({ type: 'SELECT_OVERVIEW' });
+    return;
+  }
+
   // Parse #project/projectId/{id} as per UI-SPEC
   if (hash.startsWith('#project/projectId/')) {
     const projectId = hash.replace('#project/projectId/', '');
@@ -17,14 +23,14 @@ function handleRouteChange() {
     }
   }
 
-  // Navigate to overview for anything else
-  dispatch({ type: 'SELECT_PROJECT', payload: { projectId: null } });
+  // Default to overview
+  dispatch({ type: 'SELECT_OVERVIEW' });
 }
 
 export function navigateToProject(projectId) {
   window.location.hash = `#project/projectId/${projectId}`;
 }
 
-export function navigateToList() {
-  window.location.hash = '';
+export function navigateToOverview() {
+  window.location.hash = '#overview';
 }

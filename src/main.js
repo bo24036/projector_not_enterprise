@@ -2,6 +2,7 @@ import './handlers/ProjectHandler.js';
 import './handlers/TaskHandler.js';
 import { initSidebarConnector } from './ui/connectors/SidebarConnector.js';
 import { initProjectDetailConnector } from './ui/connectors/ProjectDetailConnector.js';
+import { initOverviewConnector } from './ui/connectors/OverviewConnector.js';
 import { initRouter } from './utils/router.js';
 import { getState, setRootRenderer } from './state.js';
 import { idbReady } from './services/IdbService.js';
@@ -9,7 +10,12 @@ import { idbReady } from './services/IdbService.js';
 function renderApp() {
   const state = getState();
   initSidebarConnector('#sidebar', state);
-  initProjectDetailConnector('#main-content', state);
+
+  if (state.currentPage === 'overview') {
+    initOverviewConnector('#main-content', state);
+  } else {
+    initProjectDetailConnector('#main-content', state);
+  }
 }
 
 async function initApp() {

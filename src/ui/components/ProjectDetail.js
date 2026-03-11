@@ -43,7 +43,6 @@ export function ProjectDetail({ project, onNameChange, onDescriptionChange, onAr
             ?disabled=${isArchived}
             @change=${handleNameChange}
           />
-          <span class="project-detail__edit-icon" aria-hidden="true">✎</span>
           <input
             class="project-detail__funded-checkbox"
             type="checkbox"

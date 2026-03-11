@@ -2,10 +2,13 @@ import { html } from 'https://unpkg.com/lit-html@2/lit-html.js';
 import { TaskListItem } from '../components/TaskListItem.js';
 import { TaskInput } from '../components/TaskInput.js';
 import * as Task from '../../domains/Task.js';
+import * as Project from '../../domains/Project.js';
 import { dispatch } from '../../state.js';
 
 export function TaskListConnector({ projectId, state }) {
   const tasks = Task.getTasksByProjectId(projectId);
+  const project = Project.getProject(projectId);
+  const isArchived = project?.archived ?? false;
   const { creatingTask, editingTaskId, editingTaskName, editingTaskDueDate } = state;
 
   return html`
@@ -15,6 +18,7 @@ export function TaskListConnector({ projectId, state }) {
             ${tasks.map(task =>
               TaskListItem({
                 task,
+                isArchived,
                 isEditing: editingTaskId === task.id,
                 editName: editingTaskName,
                 editDueDate: editingTaskDueDate,
@@ -41,7 +45,7 @@ export function TaskListConnector({ projectId, state }) {
           `
         : ''}
 
-      ${creatingTask ? TaskInput({
+      ${!isArchived ? (creatingTask ? TaskInput({
         onSave: (name, dueDate) => {
           dispatch({
             type: 'CREATE_TASK',
@@ -60,7 +64,7 @@ export function TaskListConnector({ projectId, state }) {
                 [Click to add task...]
               </button>
             </div>
-          `}
+          `) : ''}
     </div>
   `;
 }

@@ -3,7 +3,7 @@ import { ProjectDetail } from '../components/ProjectDetail.js';
 import { TaskListConnector } from './TaskListConnector.js';
 import * as Project from '../../domains/Project.js';
 import { dispatch } from '../../state.js';
-import { navigateToList } from '../../utils/router.js';
+import { navigateToOverview } from '../../utils/router.js';
 
 export function initProjectDetailConnector(containerSelector, state) {
   const container = document.querySelector(containerSelector);
@@ -38,7 +38,7 @@ export function initProjectDetailConnector(containerSelector, state) {
         },
         onArchive: () => {
           dispatch({ type: 'ARCHIVE_PROJECT', payload: { projectId: project.id } });
-          navigateToList();
+          navigateToOverview();
         },
         onUnarchive: () => {
           dispatch({ type: 'UNARCHIVE_PROJECT', payload: { projectId: project.id } });
@@ -48,7 +48,7 @@ export function initProjectDetailConnector(containerSelector, state) {
         },
         onDelete: () => {
           dispatch({ type: 'DELETE_PROJECT', payload: { projectId: project.id } });
-          navigateToList();
+          navigateToOverview();
         },
       })}
 
