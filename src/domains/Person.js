@@ -223,13 +223,13 @@ export function setSuppressedNames(namesArray) {
   suppressedNamesCache.clear();
   (namesArray || []).forEach(name => suppressedNamesCache.add(name));
 
-  // Fire-and-forget persist to IDB
-  serialize({ id: 'suppressed-names', value: namesArray || [] }, 'put');
+  // Fire-and-forget persist to IDB (use putSettingToIdb, not serialize which is for people)
+  putSettingToIdb({ id: 'suppressed-names', value: namesArray || [] });
 }
 
 export function getAllUniquePersonNamesRaw() {
   const allPeople = Array.from(personCache.values());
-  return [...new Set(allPeople.map(p => p.name))];
+  return [...new Set(allPeople.map(p => p.name).filter(n => n.trim()))];
 }
 
 export async function preloadSuppressedNames() {
