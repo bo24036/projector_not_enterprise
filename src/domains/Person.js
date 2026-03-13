@@ -229,7 +229,7 @@ export function setSuppressedNames(namesArray) {
 
 export function getAllUniquePersonNamesRaw() {
   const allPeople = Array.from(personCache.values());
-  return [...new Set(allPeople.map(p => p.name).filter(n => n.trim()))];
+  return [...new Set(allPeople.map(p => p.name).filter(n => n && n.trim()))];
 }
 
 export async function preloadSuppressedNames() {
