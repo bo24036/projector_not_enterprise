@@ -84,16 +84,27 @@ export function registerHandler(actionType, handler) {
 // Error handling
 registerHandler('SET_ERROR', (state, action) => {
   const { actionType, message, entityId } = action.payload;
+  const error = {
+    actionType,
+    message,
+    entityId,
+    timestamp: Date.now(),
+  };
+
+  // Return effect that auto-dismisses error after 5 seconds
+  // Only clears if it's still the same error (prevents clearing newer errors)
+  const autoDismissEffect = () => {
+    setTimeout(() => {
+      const currentState = getState();
+      if (currentState.lastError?.timestamp === error.timestamp) {
+        dispatch({ type: 'CLEAR_ERROR' });
+      }
+    }, 5000);
+  };
+
   return {
-    state: {
-      ...state,
-      lastError: {
-        actionType,
-        message,
-        entityId,
-        timestamp: Date.now(),
-      },
-    },
+    state: { ...state, lastError: error },
+    effects: [autoDismissEffect],
   };
 });
 

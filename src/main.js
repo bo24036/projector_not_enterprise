@@ -8,12 +8,10 @@ import { initPersonalTasksConnector } from './ui/connectors/PersonalTasksConnect
 import { ErrorNotification } from './ui/components/ErrorNotification.js';
 import { render } from 'https://unpkg.com/lit-html@2/lit-html.js';
 import { initRouter } from './utils/router.js';
-import { getState, setRootRenderer, dispatch } from './state.js';
+import { getState, setRootRenderer } from './state.js';
 import { idbReady } from './services/IdbService.js';
 import * as Project from './domains/Project.js';
 import * as Person from './domains/Person.js';
-
-let lastErrorTimestamp = null;
 
 function renderApp() {
   const state = getState();
@@ -27,24 +25,10 @@ function renderApp() {
     initProjectDetailConnector('#main-content', state);
   }
 
-  // Render error notification if one exists
+  // Render error notification if one exists (auto-dismiss handled by SET_ERROR effect)
   const errorContainer = document.querySelector('#error-notification');
   if (errorContainer) {
     render(ErrorNotification({ error: state.lastError }), errorContainer);
-  }
-
-  // Auto-dismiss error after 5 seconds
-  if (state.lastError && state.lastError.timestamp !== lastErrorTimestamp) {
-    lastErrorTimestamp = state.lastError.timestamp;
-    setTimeout(() => {
-      // Only dismiss if it's still the same error
-      const currentState = getState();
-      if (currentState.lastError?.timestamp === lastErrorTimestamp) {
-        dispatch({ type: 'CLEAR_ERROR' });
-      }
-    }, 5000);
-  } else if (!state.lastError) {
-    lastErrorTimestamp = null;
   }
 }
 
