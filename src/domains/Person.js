@@ -1,3 +1,24 @@
+/**
+ * Person Domain
+ *
+ * CACHE LOADING STRATEGY: LAZY (per-project people loaded on-demand, all-people for autocomplete preloaded)
+ * Rationale: People are only needed when a specific project is selected. Lazy loading via
+ * cache-miss pattern is acceptable because:
+ * 1. PersonListConnector uses skeleton pattern while people are loading
+ * 2. People are not required for initial page load or sidebar rendering
+ * 3. Reduces startup time for projects with no people
+ *
+ * Exception: preloadAllPeople() is called at startup (main.js:38) to populate autocomplete
+ * suggestions, but this is optional—if cache is empty when autocomplete renders, it will
+ * trigger a cache-miss fetch and dispatch PERSON_LOADED to re-render.
+ *
+ * Cache-miss flow: get(id) returns undefined synchronously → queues async fetch from IDB →
+ * fetch completes and populates cache → dispatch PERSON_LOADED → connector re-renders with fresh data
+ *
+ * Contrast with Project domain: Projects must be eager-loaded because sidebar needs complete
+ * list immediately, and router must know if project is archived on initial navigation.
+ */
+
 // Import dispatch from local module (always available)
 import { dispatch } from '../state.js';
 
@@ -14,13 +35,22 @@ let _suppressedNamesLoaded = false;
 
 const ERROR_PERSON_NOT_FOUND = 'Person not found';
 
-// Create persistence queue for write-through IDB operations
+// Create persistence queue for write-through IDB operations (people entities)
 const serialize = createPersistenceQueue(
   {
     put: putPersonToIdb,
     delete: deletePersonFromIdb,
   },
   'person'
+);
+
+// Create persistence queue for settings (separate from person mutations to avoid mixing concerns)
+const settingSerialize = createPersistenceQueue(
+  {
+    put: putSettingToIdb,
+    delete: async () => {}, // Settings don't support delete, placeholder only
+  },
+  'setting'
 );
 
 export function createPerson(projectId, name, role, overrides) {
@@ -223,8 +253,9 @@ export function setSuppressedNames(namesArray) {
   suppressedNamesCache.clear();
   (namesArray || []).forEach(name => suppressedNamesCache.add(name));
 
-  // Fire-and-forget persist to IDB (use putSettingToIdb, not serialize which is for people)
-  putSettingToIdb({ id: 'suppressed-names', value: namesArray || [] });
+  // Persist to IDB via settingSerialize queue to ensure write-through with deduplication
+  // If user updates suppressed names multiple times rapidly, only final state persists
+  settingSerialize({ id: 'suppressed-names', value: namesArray || [] }, 'put');
 }
 
 export function getAllUniquePersonNamesRaw() {

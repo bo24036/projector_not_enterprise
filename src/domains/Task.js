@@ -1,3 +1,20 @@
+/**
+ * Task Domain
+ *
+ * CACHE LOADING STRATEGY: LAZY (tasks loaded on-demand via cache-miss pattern)
+ * Rationale: Tasks are only needed when a specific project is selected. Lazy loading via
+ * cache-miss pattern is acceptable because:
+ * 1. TaskListConnector uses skeleton pattern while tasks are loading
+ * 2. Tasks are not required for initial page load or sidebar rendering
+ * 3. Reduces startup time and memory footprint
+ *
+ * Cache-miss flow: get(id) returns undefined synchronously → queues async fetch from IDB →
+ * fetch completes and populates cache → dispatch TASK_LOADED → connector re-renders with fresh data
+ *
+ * Contrast with Project domain: Projects must be eager-loaded because sidebar needs complete
+ * list immediately, and router must know if project is archived on initial navigation.
+ */
+
 // Import dispatch from local module (always available)
 import { dispatch } from '../state.js';
 

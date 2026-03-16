@@ -1,3 +1,15 @@
+/**
+ * Project Domain
+ *
+ * CACHE LOADING STRATEGY: EAGER (all projects pre-loaded at startup)
+ * Rationale: Projects must be available synchronously for sidebar rendering. The sidebar
+ * needs the complete project list (grouped by archived/non-archived) immediately on page load.
+ * Additionally, the router must know if a URL-specified project is archived so it can auto-expand
+ * the archived section on initial navigation. This requires projects to be in cache before router init.
+ *
+ * See: main.js:34 (getAllProjectsAsync() called before router init)
+ */
+
 // Import IDB operations from service layer (isolates persistence I/O)
 import { getAllProjects as getAllProjectsFromIdb, putProject as putProjectToIdb, deleteProject as deleteProjectFromIdb, migrateProjectFields } from '../services/IdbService.js';
 import { createPersistenceQueue } from '../utils/PersistenceQueue.js';
