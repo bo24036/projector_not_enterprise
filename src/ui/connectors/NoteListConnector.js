@@ -14,17 +14,22 @@ export function NoteListConnector({ projectId, state }) {
 
   return html`
     <div class="note-list">
-      ${notes.map(note => NoteListItem({
+      ${notes.map(note => {
+        const parsedLink = Note.parseLinkField(note.link);
+        return NoteListItem({
         note,
         isArchived,
         isEditing: editingNoteId === note.id,
         editContent: editingNote?.content ?? '',
         editLink: editingNote?.link ?? '',
+        linkUrl: parsedLink?.url ?? null,
+        linkLabel: parsedLink?.label ?? null,
         onEdit: () => dispatch({ type: 'START_EDIT_NOTE', payload: { noteId: note.id } }),
         onDelete: () => dispatch({ type: 'DELETE_NOTE', payload: { noteId: note.id } }),
         onSave: (content, link) => dispatch({ type: 'UPDATE_NOTE', payload: { noteId: note.id, content, link } }),
         onCancel: () => dispatch({ type: 'CANCEL_EDIT_NOTE' }),
-      }))}
+      });
+      })}
 
       ${!isArchived ? (creatingNote ? NoteInput({
         onSave: (content, link) => dispatch({ type: 'CREATE_NOTE', payload: { projectId, content, link } }),

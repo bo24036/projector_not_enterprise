@@ -194,6 +194,65 @@ const afterReset = Note.getNotesByProjectId(deleteProjectId);
 assertEqual(afterReset.length, 0, '_resetCacheForTesting clears project index');
 assertEqual(Note.getNote(noteB.id), undefined, '_resetCacheForTesting clears note cache');
 
+// --- parseLinkField Tests ---
+console.log('\n=== parseLinkField Tests ===');
+
+// Empty / null
+assertEqual(Note.parseLinkField(''), null, 'parseLinkField returns null for empty string');
+assertEqual(Note.parseLinkField('   '), null, 'parseLinkField returns null for whitespace-only');
+assertEqual(Note.parseLinkField(null), null, 'parseLinkField returns null for null');
+
+// Plain URL
+const plainResult = Note.parseLinkField('https://example.com');
+assertEqual(plainResult.url, 'https://example.com', 'parseLinkField plain URL: url correct');
+assertEqual(plainResult.label, null, 'parseLinkField plain URL: label is null');
+
+// Markdown [label](url)
+const mdResult = Note.parseLinkField('[Google](https://google.com)');
+assertEqual(mdResult.url, 'https://google.com', 'parseLinkField markdown: url correct');
+assertEqual(mdResult.label, 'Google', 'parseLinkField markdown: label correct');
+
+// Markdown with whitespace in label
+const mdTrimResult = Note.parseLinkField('[  My Label  ](https://example.com)');
+assertEqual(mdTrimResult.label, 'My Label', 'parseLinkField markdown: label trimmed');
+
+// --- normalizeLinkField Tests (via createNote/updateNote) ---
+console.log('\n=== normalizeLinkField Tests ===');
+
+Note._resetCacheForTesting();
+const normProjectId = 'project_norm';
+
+// Plain URL without protocol gets https://
+const noteNoProtocol = Note.createNote(normProjectId, 'No protocol', 'example.com');
+assertEqual(noteNoProtocol.link, 'https://example.com', 'createNote normalizes plain URL without protocol');
+
+// Plain URL with http:// preserved
+const noteHttp = Note.createNote(normProjectId, 'Http', 'http://example.com');
+assertEqual(noteHttp.link, 'http://example.com', 'createNote preserves http:// protocol');
+
+// Plain URL with https:// unchanged
+const noteHttps = Note.createNote(normProjectId, 'Https', 'https://example.com');
+assertEqual(noteHttps.link, 'https://example.com', 'createNote preserves https:// protocol');
+
+// Empty link stored as empty string
+const noteNoLink = Note.createNote(normProjectId, 'No link', '');
+assertEqual(noteNoLink.link, '', 'createNote stores empty string for no link');
+
+// Markdown syntax: URL without protocol gets normalized inside brackets
+const noteMd = Note.createNote(normProjectId, 'Markdown', '[Google](google.com)');
+assertEqual(noteMd.link, '[Google](https://google.com)', 'createNote normalizes URL inside markdown syntax');
+
+// Markdown syntax: URL with protocol unchanged
+const noteMdFull = Note.createNote(normProjectId, 'Markdown full', '[Google](https://google.com)');
+assertEqual(noteMdFull.link, '[Google](https://google.com)', 'createNote preserves https:// inside markdown syntax');
+
+// updateNote also normalizes
+Note.updateNote(noteNoProtocol.id, { link: 'updated.com' });
+assertEqual(Note.getNote(noteNoProtocol.id).link, 'https://updated.com', 'updateNote normalizes plain URL without protocol');
+
+Note.updateNote(noteMd.id, { link: '[Updated](updated.com)' });
+assertEqual(Note.getNote(noteMd.id).link, '[Updated](https://updated.com)', 'updateNote normalizes URL inside markdown syntax');
+
 // --- Summary ---
 console.log(`\n=== Test Summary ===`);
 console.log(`Passed: ${testsPassed}`);

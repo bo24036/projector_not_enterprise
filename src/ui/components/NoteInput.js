@@ -39,8 +39,8 @@ export function NoteInput({ onSave, onCancel }) {
       />
       <input
         class="note-input__field note-input__field--link"
-        type="url"
-        placeholder="Link (optional)..."
+        type="text"
+        placeholder="Link or [label](url)..."
         @input=${handleLinkInput}
         @keydown=${handleKeyDown}
         @blur=${handleBlur}

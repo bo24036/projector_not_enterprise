@@ -1,7 +1,7 @@
 import { html } from 'https://unpkg.com/lit-html@2/lit-html.js';
 import { makeKeyDownHandler, makeBlurHandler, makeDeleteHandler } from '../../utils/inputHandlers.js';
 
-export function NoteListItem({ note, isEditing, editContent, editLink, isArchived, onEdit, onDelete, onSave, onCancel }) {
+export function NoteListItem({ note, isEditing, editContent, editLink, isArchived, linkUrl, linkLabel, onEdit, onDelete, onSave, onCancel }) {
   if (isEditing) {
     let contentValue = editContent;
     let linkValue = editLink;
@@ -41,8 +41,8 @@ export function NoteListItem({ note, isEditing, editContent, editLink, isArchive
         />
         <input
           class="note-input__field note-input__field--link"
-          type="url"
-          placeholder="Link (optional)..."
+          type="text"
+          placeholder="Link or [label](url)..."
           .value=${linkValue}
           @input=${handleLinkInput}
           @keydown=${handleKeyDown}
@@ -73,8 +73,8 @@ export function NoteListItem({ note, isEditing, editContent, editLink, isArchive
     <div class="note-list-item">
       <div class="note-list-item__content">
         <span class="note-list-item__text">${note.content}</span>
-        ${note.link
-          ? html`<a class="note-list-item__link" href=${note.link} target="_blank" rel="noopener noreferrer">${note.link}</a>`
+        ${linkUrl
+          ? html`<a class="note-list-item__link" href=${linkUrl} target="_blank" rel="noopener noreferrer">${linkLabel ?? linkUrl}</a>`
           : ''}
       </div>
       ${!isArchived ? html`

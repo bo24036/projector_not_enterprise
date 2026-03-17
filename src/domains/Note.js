@@ -22,6 +22,44 @@ const projectIdIndex = new Map(); // Map of projectId -> Set of noteIds
 
 const ERROR_NOTE_NOT_FOUND = 'Note not found';
 
+// Add https:// to a bare URL if no protocol is present
+function normalizeUrl(url) {
+  if (!url) return url;
+  if (/^https?:\/\//i.test(url)) return url;
+  return `https://${url}`;
+}
+
+// Normalize a raw link field before storing.
+// Handles plain URLs and markdown [label](url) syntax.
+// Ensures the URL portion always has a protocol.
+function normalizeLinkField(raw) {
+  if (!raw?.trim()) return '';
+  const trimmed = raw.trim();
+
+  const markdownMatch = trimmed.match(/^\[(.+)\]\((.+)\)$/);
+  if (markdownMatch) {
+    const label = markdownMatch[1];
+    const url = normalizeUrl(markdownMatch[2].trim());
+    return `[${label}](${url})`;
+  }
+
+  return normalizeUrl(trimmed);
+}
+
+// Parse a stored link field for display. Returns { url, label } or null if empty.
+// label is null for plain URLs; a string for markdown [label](url) syntax.
+export function parseLinkField(raw) {
+  if (!raw?.trim()) return null;
+  const trimmed = raw.trim();
+
+  const markdownMatch = trimmed.match(/^\[(.+)\]\((.+)\)$/);
+  if (markdownMatch) {
+    return { label: markdownMatch[1].trim(), url: markdownMatch[2].trim() };
+  }
+
+  return { label: null, url: trimmed };
+}
+
 const serialize = createPersistenceQueue(
   {
     put: putNoteToIdb,
@@ -44,7 +82,7 @@ export function createNote(projectId, content, link) {
     id: generateId('note'),
     projectId,
     content: noteContent,
-    link: (link || '').trim(),
+    link: normalizeLinkField(link),
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
@@ -137,7 +175,7 @@ export function updateNote(id, updates) {
   }
 
   if (updates.link !== undefined) {
-    note.link = updates.link.trim();
+    note.link = normalizeLinkField(updates.link);
   }
 
   note.updatedAt = new Date().toISOString();
