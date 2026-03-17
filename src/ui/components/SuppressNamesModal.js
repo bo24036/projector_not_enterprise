@@ -1,4 +1,4 @@
-import { html } from 'https://unpkg.com/lit-html@2/lit-html.js';
+import { html } from '/vendor/lit-html/lit-html.js';
 
 export function SuppressNamesModal({ allNames, suppressedNames, onSave, onClose }) {
   const selection = new Set(suppressedNames);

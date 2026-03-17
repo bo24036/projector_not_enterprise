@@ -1,4 +1,4 @@
-import { html } from 'https://unpkg.com/lit-html@2/lit-html.js';
+import { html } from '/vendor/lit-html/lit-html.js';
 import { TaskListItem } from '../components/TaskListItem.js';
 import { TaskInput } from '../components/TaskInput.js';
 import * as Task from '../../domains/Task.js';

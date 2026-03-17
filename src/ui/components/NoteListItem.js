@@ -1,4 +1,4 @@
-import { html } from 'https://unpkg.com/lit-html@2/lit-html.js';
+import { html } from '/vendor/lit-html/lit-html.js';
 import { makeKeyDownHandler, makeBlurHandler, makeDeleteHandler } from '../../utils/inputHandlers.js';
 
 export function NoteListItem({ note, isEditing, editContent, editLink, isArchived, linkUrl, linkLabel, onEdit, onDelete, onSave, onCancel }) {

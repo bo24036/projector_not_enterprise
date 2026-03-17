@@ -1,4 +1,4 @@
-import { html } from 'https://unpkg.com/lit-html@2/lit-html.js';
+import { html } from '/vendor/lit-html/lit-html.js';
 import { makeKeyDownHandler, makeBlurHandler } from '../../utils/inputHandlers.js';
 import { makeDatalistId } from '../../utils/domUtils.js';
 

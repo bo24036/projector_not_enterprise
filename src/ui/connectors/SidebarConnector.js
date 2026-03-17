@@ -1,4 +1,4 @@
-import { html, render } from 'https://unpkg.com/lit-html@2/lit-html.js';
+import { html, render } from '/vendor/lit-html/lit-html.js';
 import { ProjectListItem } from '../components/ProjectListItem.js';
 import { ProjectNewItem } from '../components/ProjectNewItem.js';
 import { ProjectInput } from '../components/ProjectInput.js';

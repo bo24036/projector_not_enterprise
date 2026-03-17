@@ -1,4 +1,4 @@
-import { html } from 'https://unpkg.com/lit-html@2/lit-html.js';
+import { html } from '/vendor/lit-html/lit-html.js';
 import { dispatch } from '../../state.js';
 
 export function ErrorNotification({ error }) {

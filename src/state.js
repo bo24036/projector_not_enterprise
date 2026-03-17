@@ -78,6 +78,11 @@ export function registerHandler(actionType, handler) {
   handlers[actionType] = handler;
 }
 
+// Test utility — exposes registered handlers for direct invocation in tests
+export function _getHandlerForTesting(actionType) {
+  return handlers[actionType];
+}
+
 // Error handling
 registerHandler('SET_ERROR', (state, action) => {
   const { actionType, message, entityId } = action.payload;

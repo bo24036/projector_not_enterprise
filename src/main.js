@@ -7,7 +7,7 @@ import { initProjectDetailConnector } from './ui/connectors/ProjectDetailConnect
 import { initOverviewConnector } from './ui/connectors/OverviewConnector.js';
 import { initPersonalTasksConnector } from './ui/connectors/PersonalTasksConnector.js';
 import { ErrorNotification } from './ui/components/ErrorNotification.js';
-import { render } from 'https://unpkg.com/lit-html@2/lit-html.js';
+import { render } from '/vendor/lit-html/lit-html.js';
 import { initRouter } from './utils/router.js';
 import { getState, setRootRenderer } from './state.js';
 import { idbReady } from './utils/IdbService.js';

@@ -1,4 +1,4 @@
-import { html, render } from 'https://unpkg.com/lit-html@2/lit-html.js';
+import { html, render } from '/vendor/lit-html/lit-html.js';
 import { ProjectDetail } from '../components/ProjectDetail.js';
 import { TaskListConnector } from './TaskListConnector.js';
 import { PersonInput } from '../components/PersonInput.js';

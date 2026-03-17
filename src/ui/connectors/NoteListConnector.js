@@ -1,4 +1,4 @@
-import { html } from 'https://unpkg.com/lit-html@2/lit-html.js';
+import { html } from '/vendor/lit-html/lit-html.js';
 import { NoteListItem } from '../components/NoteListItem.js';
 import { NoteInput } from '../components/NoteInput.js';
 import * as Note from '../../domains/Note.js';

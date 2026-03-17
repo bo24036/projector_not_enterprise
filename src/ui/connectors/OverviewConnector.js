@@ -1,4 +1,4 @@
-import { html, render } from 'https://unpkg.com/lit-html@2/lit-html.js';
+import { html, render } from '/vendor/lit-html/lit-html.js';
 import { OverviewPage } from '../components/OverviewPage.js';
 import * as Project from '../../domains/Project.js';
 import * as Task from '../../domains/Task.js';

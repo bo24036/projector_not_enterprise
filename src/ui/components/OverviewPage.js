@@ -1,4 +1,4 @@
-import { html } from 'https://unpkg.com/lit-html@2/lit-html.js';
+import { html } from '/vendor/lit-html/lit-html.js';
 
 export function OverviewPage({ personalTasks = [], projects }) {
   if (personalTasks.length === 0 && projects.length === 0) {
