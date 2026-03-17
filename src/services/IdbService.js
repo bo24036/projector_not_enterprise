@@ -24,7 +24,7 @@ async function getDatabase() {
 
   if (db) return db;
 
-  db = await openDB('projector', 4, {
+  db = await openDB('projector', 5, {
     upgrade(db) {
       if (!db.objectStoreNames.contains('projects')) {
         db.createObjectStore('projects', { keyPath: 'id' });
@@ -37,6 +37,9 @@ async function getDatabase() {
       }
       if (!db.objectStoreNames.contains('settings')) {
         db.createObjectStore('settings', { keyPath: 'id' });
+      }
+      if (!db.objectStoreNames.contains('notes')) {
+        db.createObjectStore('notes', { keyPath: 'id' });
       }
     },
   });
@@ -187,6 +190,49 @@ export async function deletePersonFromIdb(id) {
     await database.delete('people', id);
   } catch (error) {
     console.error(`Failed to delete person ${id}:`, error.message);
+  }
+}
+
+// Fetch a single note from IDB. Returns undefined if not found.
+// In Node.js test environment where IDB is unavailable, returns undefined.
+export async function getNoteFromIdb(id) {
+  const database = await getDatabase();
+  if (!database) return undefined;
+  return database.get('notes', id);
+}
+
+// Fetch all notes for a project from IDB. Returns empty array if none exist.
+// In Node.js test environment where IDB is unavailable, returns empty array.
+export async function getNotesByProjectIdFromIdb(projectId) {
+  const database = await getDatabase();
+  if (!database) return [];
+  const notes = await database.getAll('notes');
+  return (notes || []).filter(note => note.projectId === projectId);
+}
+
+// Save a note to IDB. Fire-and-forget; errors logged to console.
+// In Node.js test environment where IDB is unavailable, returns immediately.
+export async function putNoteToIdb(note) {
+  const database = await getDatabase();
+  if (!database) return;
+
+  try {
+    await database.put('notes', note);
+  } catch (error) {
+    console.error(`Failed to persist note ${note.id}:`, error.message);
+  }
+}
+
+// Delete a note from IDB. Fire-and-forget; errors logged to console.
+// In Node.js test environment where IDB is unavailable, returns immediately.
+export async function deleteNoteFromIdb(id) {
+  const database = await getDatabase();
+  if (!database) return;
+
+  try {
+    await database.delete('notes', id);
+  } catch (error) {
+    console.error(`Failed to delete note ${id}:`, error.message);
   }
 }
 
