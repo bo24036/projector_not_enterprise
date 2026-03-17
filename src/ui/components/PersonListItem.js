@@ -2,7 +2,7 @@ import { html } from 'https://unpkg.com/lit-html@2/lit-html.js';
 import { makeKeyDownHandler, makeBlurHandler, makeDeleteHandler } from '../../utils/inputHandlers.js';
 import { makeDatalistId } from '../../utils/domUtils.js';
 
-export function PersonListItem({ person, isEditing, editName, editRole, onEdit, onDelete, onSave, onCancel, nameOptions = [], roleOptions = [] }) {
+export function PersonListItem({ person, isArchived, isEditing, editName, editRole, onEdit, onDelete, onSave, onCancel, nameOptions = [], roleOptions = [] }) {
   if (isEditing) {
     let nameValue = editName;
     let roleValue = editRole;
@@ -88,14 +88,16 @@ export function PersonListItem({ person, isEditing, editName, editRole, onEdit, 
         <span class="person-list-item__name">${person.name}</span>
         ${person.role ? html`<span class="person-list-item__role">${person.role}</span>` : ''}
       </div>
-      <div class="person-list-item__actions">
-        <button class="person-list-item__edit" @click=${onEdit} title="Edit">
-          ✎
-        </button>
-        <button class="person-list-item__delete" @click=${handleDelete} title="Delete">
-          ×
-        </button>
-      </div>
+      ${!isArchived ? html`
+        <div class="person-list-item__actions">
+          <button class="person-list-item__edit" @click=${onEdit} title="Edit">
+            ✎
+          </button>
+          <button class="person-list-item__delete" @click=${handleDelete} title="Delete">
+            ×
+          </button>
+        </div>
+      ` : ''}
     </div>
   `;
 }

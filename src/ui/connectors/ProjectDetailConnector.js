@@ -70,6 +70,7 @@ export function initProjectDetailConnector(containerSelector, state) {
         <div class="project-detail__people">
           ${people.map(person => PersonListItem({
             person,
+            isArchived: project.archived,
             isEditing: editingPersonId === person.id,
             editName: editingPerson?.name ?? '',
             editRole: editingPerson?.role ?? '',
@@ -80,7 +81,7 @@ export function initProjectDetailConnector(containerSelector, state) {
             onSave: (name, role) => dispatch({ type: 'UPDATE_PERSON', payload: { personId: person.id, name, role } }),
             onCancel: () => dispatch({ type: 'CANCEL_EDIT_PERSON' }),
           }))}
-          ${!creatingPerson
+          ${!project.archived ? (!creatingPerson
             ? html`<div class="person-list-item person-list-item--placeholder">
                 <button class="person-list-item__placeholder-button"
                   @click=${() => dispatch({ type: 'START_CREATE_PERSON' })}>
@@ -93,7 +94,7 @@ export function initProjectDetailConnector(containerSelector, state) {
                 onSave: (name, role) => dispatch({ type: 'CREATE_PERSON', payload: { projectId: project.id, name, role } }),
                 onCancel: () => dispatch({ type: 'CANCEL_CREATE_PERSON' }),
               })
-          }
+          ) : ''}
         </div>
       </div>
 
