@@ -320,11 +320,19 @@
 .task-list-item--creating,
 .task-list-item--editing,
 .person-list-item--creating,
-.person-list-item--editing,
-.note-list-item--creating,
-.note-list-item--editing {
+.person-list-item--editing {
   display: flex;
   align-items: center;
+  gap: var(--spacing-xs);
+  background-color: var(--color-surface-hover);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-xs);
+}
+
+.note-list-item--creating,
+.note-list-item--editing {
+  display: grid;
+  grid-template-columns: 1fr auto;
   gap: var(--spacing-xs);
   background-color: var(--color-surface-hover);
   border-radius: var(--border-radius-md);
@@ -362,12 +370,12 @@
 }
 
 .note-input__field--content {
-  flex: 1;
+  grid-column: 1 / -1;
   min-width: 0;
 }
 
 .note-input__field--link {
-  flex: 0 0 200px;
+  min-width: 0;
 }
 
 /* Input controls shared styles */
