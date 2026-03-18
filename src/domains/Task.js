@@ -282,6 +282,17 @@ export function getOpenTaskCount(projectId) {
   return getTasksByProjectId(projectId).filter(t => !t.completed).length;
 }
 
+const URGENCY_RANK = { red: 0, orange: 1, yellow: 2, gray: 3 };
+
+export function getProjectUrgency(projectId) {
+  const tasks = getTasksByProjectId(projectId).filter(t => !t.completed && t.dueDate);
+  if (tasks.length === 0) return 'gray';
+  return tasks.reduce((worst, task) => {
+    const u = getUrgency(task.dueDate);
+    return URGENCY_RANK[u] < URGENCY_RANK[worst] ? u : worst;
+  }, 'gray');
+}
+
 export function updateTask(id, updates) {
   const task = getTask(id);
   if (!task) {

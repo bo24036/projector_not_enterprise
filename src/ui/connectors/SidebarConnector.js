@@ -72,6 +72,7 @@ export function initSidebarConnector(containerSelector, state) {
             project,
             isSelected: state.currentProjectId === project.id,
             openTaskCount: Task.getOpenTaskCount(project.id),
+            urgency: Task.getProjectUrgency(project.id),
             onSelect: () => navigateToProject(project.id),
           })
         )}

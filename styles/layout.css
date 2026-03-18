@@ -383,6 +383,23 @@
 }
 
 
+/* Sidebar project urgency color coding */
+.project-list-item.urgency-red {
+  border-left: 3px solid var(--color-error);
+}
+
+.project-list-item.urgency-orange {
+  border-left: 3px solid var(--color-warning);
+}
+
+.project-list-item.urgency-yellow {
+  border-left: 3px solid #FBC02D;
+}
+
+.project-list-item.urgency-gray {
+  border-left: 3px solid transparent;
+}
+
 /* Task urgency color coding */
 .task-list-item.urgency-red {
   border-left: 3px solid var(--color-error);
