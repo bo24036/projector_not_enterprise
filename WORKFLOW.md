@@ -10,6 +10,8 @@
 
 Avoid bundling unrelated changes in one commit. This makes history readable and enables clean bisecting.
 
+**Commit after every change:** After completing any code change, commit immediately with an appropriate conventional commit message.
+
 **Commit messages:** Use clear, descriptive messages that explain *what* changed and *why*:
 - Bad: `Fix stuff` or `WIP`
 - Good: `Add task creation form component` or `Fix race condition in concurrent task fetches`
