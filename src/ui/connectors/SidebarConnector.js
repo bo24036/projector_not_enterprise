@@ -82,7 +82,7 @@ export function initSidebarConnector(containerSelector, state) {
       <div class="sidebar__footer">
         <button class="sidebar__suppress-btn"
           @click=${() => dispatch({ type: 'OPEN_SUPPRESS_NAMES_MODAL' })}>
-          Manage Suppressed Names
+          Suppress Names
         </button>
       </div>
     </div>
