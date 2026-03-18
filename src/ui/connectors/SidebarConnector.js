@@ -25,6 +25,11 @@ export function initSidebarConnector(containerSelector, state) {
   const overviewUrgency = [...activeProjects.map(p => Task.getProjectUrgency(p.id)), personalUrgency]
     .reduce((worst, u) => URGENCY_RANK[u] < URGENCY_RANK[worst] ? u : worst, 'gray');
 
+  const personalProgress = Task.getProjectProgress(null);
+  const allOverviewTasks = [...activeProjects.flatMap(p => Task.getTasksByProjectId(p.id)), ...Task.getPersonalTasks()];
+  const overviewProgress = allOverviewTasks.length === 0 ? null
+    : Math.round(allOverviewTasks.filter(t => t.completed).length / allOverviewTasks.length * 100);
+
   const allNames = Person.getAllUniquePersonNamesRaw() || [];
   const suppressedNames = Person.getSuppressedNames();
 
@@ -63,12 +68,18 @@ export function initSidebarConnector(containerSelector, state) {
 
       <button class="sidebar__overview-btn urgency-${overviewUrgency} ${state.currentPage === 'overview' ? 'is-active' : ''}" @click=${navigateToOverview}>
         Overview
-        ${overviewTaskCount > 0 ? html`<span class="sidebar__count">${overviewTaskCount}</span>` : ''}
+        <span class="project-list-item__meta">
+          ${overviewTaskCount > 0 ? html`<span class="sidebar__count">${overviewTaskCount}</span>` : ''}
+          ${overviewProgress !== null ? html`<span class="project-progress-ring" style="--progress: ${overviewProgress}"></span>` : ''}
+        </span>
       </button>
 
       <button class="sidebar__personal-btn urgency-${personalUrgency} ${state.currentPage === 'personal' ? 'is-active' : ''}" @click=${navigateToPersonal}>
         My Tasks
-        ${personalTaskCount > 0 ? html`<span class="sidebar__count">${personalTaskCount}</span>` : ''}
+        <span class="project-list-item__meta">
+          ${personalTaskCount > 0 ? html`<span class="sidebar__count">${personalTaskCount}</span>` : ''}
+          ${personalProgress !== null ? html`<span class="project-progress-ring" style="--progress: ${personalProgress}"></span>` : ''}
+        </span>
       </button>
 
       <div class="sidebar__list">

@@ -104,7 +104,9 @@
   flex-shrink: 0;
 }
 
-.project-list-item.is-selected .project-progress-ring {
+.project-list-item.is-selected .project-progress-ring,
+.sidebar__overview-btn.is-active .project-progress-ring,
+.sidebar__personal-btn.is-active .project-progress-ring {
   --ring-track: rgba(255, 255, 255, 0.35);
 }
 
