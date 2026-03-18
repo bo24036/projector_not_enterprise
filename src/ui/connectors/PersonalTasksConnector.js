@@ -74,4 +74,11 @@ export function initPersonalTasksConnector(containerSelector, state) {
   `;
 
   render(template, container);
+
+  requestAnimationFrame(() => {
+    if (state.creatingTask || state.editingTaskId) {
+      const taskInput = container.querySelector('[data-task-autofocus]');
+      if (taskInput) taskInput.focus();
+    }
+  });
 }
