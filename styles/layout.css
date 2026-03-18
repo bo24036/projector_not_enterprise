@@ -329,16 +329,6 @@
   padding: var(--spacing-xs);
 }
 
-.note-list-item--creating,
-.note-list-item--editing {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: var(--spacing-xs);
-  background-color: var(--color-surface-hover);
-  border-radius: var(--border-radius-md);
-  padding: var(--spacing-xs);
-}
-
 /* Input field shared styles */
 .list-item-input__field,
 .task-input__field,
@@ -1076,6 +1066,16 @@
 .note-list-item__delete:hover {
   background-color: var(--color-surface-hover);
   color: var(--color-text);
+}
+
+.note-list-item--creating,
+.note-list-item--editing {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--spacing-xs);
+  background-color: var(--color-surface-hover);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-xs);
 }
 
 /* Suppress names modal */
