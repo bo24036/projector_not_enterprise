@@ -53,6 +53,11 @@ async function initApp() {
   // Register root renderer before router init so initial navigation triggers render
   setRootRenderer(renderApp);
 
+  // Register service worker — fire and forget, app initializes independently
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js');
+  }
+
   // Initialize router - this will dispatch initial navigation action
   // The dispatch will schedule renderApp via rAF, so we don't need to call it explicitly
   initRouter();
