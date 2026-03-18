@@ -89,18 +89,23 @@
 }
 
 .project-progress-ring {
+  --ring-track: rgba(0, 0, 0, 0.2);
   display: block;
   width: 14px;
   height: 14px;
   border-radius: 50%;
   background: conic-gradient(
     currentColor calc(var(--progress) * 1%),
-    rgba(128, 128, 128, 0.25) 0
+    var(--ring-track) 0
   );
   mask: radial-gradient(farthest-side, transparent 55%, black 55%);
   -webkit-mask: radial-gradient(farthest-side, transparent 55%, black 55%);
-  opacity: 0.6;
+  opacity: 0.7;
   flex-shrink: 0;
+}
+
+.project-list-item.is-selected .project-progress-ring {
+  --ring-track: rgba(255, 255, 255, 0.35);
 }
 
 .project-list-item.is-selected .project-list-item__button {
