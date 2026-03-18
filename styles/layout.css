@@ -89,7 +89,7 @@
 }
 
 .project-progress-ring {
-  --ring-track: rgba(0, 0, 0, 0.2);
+  --ring-track: rgba(128, 128, 128, 0.4);
   display: block;
   width: 14px;
   height: 14px;
