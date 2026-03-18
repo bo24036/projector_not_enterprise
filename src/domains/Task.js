@@ -278,6 +278,10 @@ export function getPersonalTasks() {
   return getTasksByProjectId(null);
 }
 
+export function getOpenTaskCount(projectId) {
+  return getTasksByProjectId(projectId).filter(t => !t.completed).length;
+}
+
 export function updateTask(id, updates) {
   const task = getTask(id);
   if (!task) {

@@ -4,6 +4,7 @@ import { ProjectNewItem } from '../components/ProjectNewItem.js';
 import { ProjectInput } from '../components/ProjectInput.js';
 import { SuppressNamesModal } from '../components/SuppressNamesModal.js';
 import * as Project from '../../domains/Project.js';
+import * as Task from '../../domains/Task.js';
 import * as Person from '../../domains/Person.js';
 import { dispatch } from '../../state.js';
 import { navigateToProject, navigateToOverview, navigateToPersonal } from '../../utils/router.js';
@@ -15,6 +16,9 @@ export function initSidebarConnector(containerSelector, state) {
   const allProjects = Project.getAllProjects() || [];
   const activeProjects = allProjects.filter(p => !p.archived);
   const archivedProjects = allProjects.filter(p => p.archived);
+
+  const personalTaskCount = Task.getOpenTaskCount(null);
+  const overviewTaskCount = activeProjects.reduce((sum, p) => sum + Task.getOpenTaskCount(p.id), 0) + personalTaskCount;
 
   const allNames = Person.getAllUniquePersonNamesRaw() || [];
   const suppressedNames = Person.getSuppressedNames();
@@ -54,10 +58,12 @@ export function initSidebarConnector(containerSelector, state) {
 
       <button class="sidebar__overview-btn ${state.currentPage === 'overview' ? 'is-active' : ''}" @click=${navigateToOverview}>
         Overview
+        ${overviewTaskCount > 0 ? html`<span class="sidebar__count">${overviewTaskCount}</span>` : ''}
       </button>
 
       <button class="sidebar__personal-btn ${state.currentPage === 'personal' ? 'is-active' : ''}" @click=${navigateToPersonal}>
         My Tasks
+        ${personalTaskCount > 0 ? html`<span class="sidebar__count">${personalTaskCount}</span>` : ''}
       </button>
 
       <div class="sidebar__list">
@@ -65,6 +71,7 @@ export function initSidebarConnector(containerSelector, state) {
           ProjectListItem({
             project,
             isSelected: state.currentProjectId === project.id,
+            openTaskCount: Task.getOpenTaskCount(project.id),
             onSelect: () => navigateToProject(project.id),
           })
         )}
