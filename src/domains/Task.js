@@ -282,6 +282,14 @@ export function getOpenTaskCount(projectId) {
   return getTasksByProjectId(projectId).filter(t => !t.completed).length;
 }
 
+// Returns completion percentage (0-100), or null if no tasks exist
+export function getProjectProgress(projectId) {
+  const tasks = getTasksByProjectId(projectId);
+  if (tasks.length === 0) return null;
+  const completed = tasks.filter(t => t.completed).length;
+  return Math.round((completed / tasks.length) * 100);
+}
+
 const URGENCY_RANK = { red: 0, orange: 1, yellow: 2, gray: 3 };
 
 export function getProjectUrgency(projectId) {

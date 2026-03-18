@@ -81,6 +81,28 @@
   color: var(--color-text);
 }
 
+.project-list-item__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  flex-shrink: 0;
+}
+
+.project-progress-ring {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: conic-gradient(
+    currentColor calc(var(--progress) * 1%),
+    rgba(128, 128, 128, 0.25) 0
+  );
+  mask: radial-gradient(farthest-side, transparent 55%, black 55%);
+  -webkit-mask: radial-gradient(farthest-side, transparent 55%, black 55%);
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
 .project-list-item.is-selected .project-list-item__button {
   background-color: var(--color-primary);
   color: var(--color-text-light);
