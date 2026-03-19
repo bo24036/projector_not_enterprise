@@ -432,7 +432,7 @@
 }
 
 .project-list-item__hold-icon {
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-lg);
   color: #64748b;
   flex-shrink: 0;
 }
@@ -442,7 +442,7 @@
 }
 
 .project-list-item.is-selected .project-list-item__hold-icon {
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 /* Task urgency color coding */
