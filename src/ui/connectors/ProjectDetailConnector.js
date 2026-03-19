@@ -1,12 +1,14 @@
 import { html, render } from '/vendor/lit-html/lit-html.js';
 import { focusAutofocusElement } from '../../utils/domHelpers.js';
 import { ProjectDetail } from '../components/ProjectDetail.js';
+import { RestoreProjectModal } from '../components/RestoreProjectModal.js';
 import { TaskListConnector } from './TaskListConnector.js';
 import { PersonInput } from '../components/PersonInput.js';
 import { PersonListItem } from '../components/PersonListItem.js';
 import { NoteListConnector } from './NoteListConnector.js';
 import * as Project from '../../domains/Project.js';
 import * as Person from '../../domains/Person.js';
+import * as Settings from '../../domains/Settings.js';
 import { dispatch } from '../../state.js';
 import { navigateToOverview } from '../../utils/router.js';
 
@@ -26,6 +28,10 @@ export function initProjectDetailConnector(containerSelector, state) {
     return;
   }
 
+  const isHeld = project.heldAt !== null;
+  const holdReviewDays = Settings.getHoldReviewDays();
+  const isReviewDue = isHeld && (Date.now() - project.heldAt > holdReviewDays * 86400000);
+
   const people = Person.getPeopleByProjectId(project.id) || [];
   const { names: allNames, roles: allRoles } = Person.getAllPeopleForAutocomplete();
   const { creatingPerson, editingPersonId } = state;
@@ -35,6 +41,7 @@ export function initProjectDetailConnector(containerSelector, state) {
     <div class="project-detail-container">
       ${ProjectDetail({
         project,
+        isReviewDue,
         onNameChange: (newName) => {
           if (newName.trim() && newName !== project.name) {
             dispatch({ type: 'RENAME_PROJECT', payload: { projectId: project.id, newName } });
@@ -59,7 +66,19 @@ export function initProjectDetailConnector(containerSelector, state) {
           dispatch({ type: 'DELETE_PROJECT', payload: { projectId: project.id } });
           navigateToOverview();
         },
+        onHold: () => {
+          dispatch({ type: 'HOLD_PROJECT', payload: { projectId: project.id } });
+        },
+        onRestore: () => {
+          dispatch({ type: 'SHOW_RESTORE_MODAL', payload: { projectId: project.id } });
+        },
       })}
+
+      ${state.restoringProjectId === project.id ? RestoreProjectModal({
+        onKeep: () => dispatch({ type: 'RESTORE_PROJECT', payload: { projectId: project.id, clearDueDates: false } }),
+        onClear: () => dispatch({ type: 'RESTORE_PROJECT', payload: { projectId: project.id, clearDueDates: true } }),
+        onClose: () => dispatch({ type: 'SHOW_RESTORE_MODAL', payload: { projectId: null } }),
+      }) : ''}
 
       <div class="project-detail__tasks-section">
         <h3 class="project-detail__section-title">Tasks</h3>
@@ -107,6 +126,13 @@ export function initProjectDetailConnector(containerSelector, state) {
   `;
 
   render(template, container);
+
+  requestAnimationFrame(() => {
+    if (state.restoringProjectId === project.id) {
+      const dialog = container.querySelector('.restore-modal');
+      if (dialog && !dialog.open) dialog.showModal();
+    }
+  });
 
   focusAutofocusElement(container);
 }

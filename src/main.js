@@ -13,6 +13,7 @@ import { getState, setRootRenderer } from './state.js';
 import { idbReady } from './utils/IdbService.js';
 import * as Project from './domains/Project.js';
 import * as Person from './domains/Person.js';
+import * as Settings from './domains/Settings.js';
 
 function renderApp() {
   const state = getState();
@@ -49,6 +50,9 @@ async function initApp() {
   // Pre-load suppressed names from IDB
   // This ensures suppressed names are loaded before autocomplete is rendered
   await Person.preloadSuppressedNames();
+
+  // Pre-load app settings from IDB
+  await Settings.preloadSettings();
 
   // Register root renderer before router init so initial navigation triggers render
   setRootRenderer(renderApp);

@@ -10,7 +10,8 @@ const state = {
   editingPersonId: null,
   creatingNote: false,
   editingNoteId: null,
-  showSuppressNamesModal: false,
+  showSettingsModal: false,
+  restoringProjectId: null,
   lastError: null, // { actionType, message, entityId, timestamp } - cleared when dismissed or on next action
 };
 

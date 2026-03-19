@@ -1,9 +1,10 @@
 import { html } from '/vendor/lit-html/lit-html.js';
 
-export function ProjectDetail({ project, onNameChange, onDescriptionChange, onArchive, onUnarchive, onToggleFunded, onDelete }) {
+export function ProjectDetail({ project, onNameChange, onDescriptionChange, onArchive, onUnarchive, onToggleFunded, onDelete, onHold, onRestore, isReviewDue }) {
   if (!project) return html``;
 
   const isArchived = project.archived;
+  const isHeld = project.heldAt !== null;
 
   function handleNameChange(event) {
     onNameChange(event.target.value);
@@ -53,6 +54,13 @@ export function ProjectDetail({ project, onNameChange, onDescriptionChange, onAr
               @change=${handleToggleFunded}
             />
             <span class="project-detail__funded-label" aria-hidden="true">$</span>
+            ${!isArchived ? html`
+              <button
+                class="project-detail__hold-button ${isHeld ? (isReviewDue ? 'project-detail__hold-button--review-due' : 'project-detail__hold-button--active') : ''}"
+                aria-label=${isHeld ? 'Restore project' : 'Put project on hold'}
+                @click=${isHeld ? onRestore : onHold}
+              >${isHeld ? '▶' : '⏸'}</button>
+            ` : ''}
           </div>
           <div class="project-detail__description-inline">
             <label class="project-detail__label">Description</label>

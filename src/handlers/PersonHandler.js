@@ -1,4 +1,5 @@
 import * as Person from '../domains/Person.js';
+import * as Settings from '../domains/Settings.js';
 import { registerHandler } from '../state.js';
 import { createToggleCreateHandler, createEditHandlers, createNoOpLoadedHandler } from '../utils/handlerFactory.js';
 
@@ -82,19 +83,24 @@ createEditHandlers('PERSON', {
 // Create no-op handler that triggers re-render when person is loaded
 createNoOpLoadedHandler('PERSON_LOADED');
 
-// Modal handlers for suppress names feature
-registerHandler('OPEN_SUPPRESS_NAMES_MODAL', (state) => {
-  return { state: { ...state, showSuppressNamesModal: true } };
+// Settings modal handlers
+registerHandler('OPEN_SETTINGS_MODAL', (state) => {
+  return { state: { ...state, showSettingsModal: true } };
 });
 
-registerHandler('CLOSE_SUPPRESS_NAMES_MODAL', (state) => {
-  return { state: { ...state, showSuppressNamesModal: false } };
+registerHandler('CLOSE_SETTINGS_MODAL', (state) => {
+  return { state: { ...state, showSettingsModal: false } };
+});
+
+registerHandler('UPDATE_HOLD_REVIEW_DAYS', (state, action) => {
+  Settings.setHoldReviewDays(action.payload.days);
+  return { state };
 });
 
 registerHandler('UPDATE_SUPPRESSED_NAMES', (state, action) => {
   try {
     Person.setSuppressedNames(action.payload.names);
-    return { state: { ...state, showSuppressNamesModal: false } };
+    return { state: { ...state, showSettingsModal: false } };
   } catch (error) {
     return {
       state: {

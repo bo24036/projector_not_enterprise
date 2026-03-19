@@ -278,6 +278,16 @@ export function getPersonalTasks() {
   return getTasksByProjectId(null);
 }
 
+export function clearDueDatesForProject(projectId) {
+  const tasks = getTasksByProjectId(projectId);
+  for (const task of tasks) {
+    if (task.dueDate !== null) {
+      task.dueDate = null;
+      serialize(task, 'put');
+    }
+  }
+}
+
 export function getOpenTaskCount(projectId) {
   return getTasksByProjectId(projectId).filter(t => !t.completed).length;
 }

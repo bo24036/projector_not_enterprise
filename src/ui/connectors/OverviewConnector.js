@@ -10,8 +10,8 @@ export function initOverviewConnector(containerSelector, state) {
   const container = document.querySelector(containerSelector);
   if (!container) return;
 
-  // Get all non-archived projects
-  const projects = Project.getAllProjects().filter(p => !p.archived);
+  // Get all non-archived, non-held projects
+  const projects = Project.getAllProjects().filter(p => !p.archived && !p.heldAt);
 
   // Get personal tasks (incomplete only)
   const personalTasks = Task.getPersonalTasks()

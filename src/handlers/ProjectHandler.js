@@ -1,4 +1,5 @@
 import * as Project from '../domains/Project.js';
+import * as Task from '../domains/Task.js';
 import { registerHandler } from '../state.js';
 import { createToggleCreateHandler, createNoOpLoadedHandler, createMutationHandler } from '../utils/handlerFactory.js';
 import { navigateToProject } from '../utils/router.js';
@@ -95,6 +96,23 @@ registerHandler('TOGGLE_ARCHIVED_PROJECTS', (state) => {
 
 createMutationHandler('TOGGLE_FUNDED', ({ projectId }) => {
   Project.toggleFunded(projectId);
+});
+
+createMutationHandler('HOLD_PROJECT', ({ projectId }) => {
+  Project.holdProject(projectId);
+});
+
+registerHandler('SHOW_RESTORE_MODAL', (state, action) => {
+  return { state: { ...state, restoringProjectId: action.payload.projectId ?? null } };
+});
+
+registerHandler('RESTORE_PROJECT', (state, action) => {
+  const { projectId, clearDueDates } = action.payload;
+  Project.restoreProject(projectId);
+  if (clearDueDates) {
+    Task.clearDueDatesForProject(projectId);
+  }
+  return { state: { ...state, restoringProjectId: null } };
 });
 
 // Create START_CREATE_PROJECT and CANCEL_CREATE_PROJECT handlers

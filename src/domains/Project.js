@@ -51,6 +51,7 @@ export function createProject(overrides = {}) {
     funded: overrides.funded || false,
     createdAt: overrides.createdAt || new Date().toISOString(),
     archivedAt: overrides.archivedAt || null,
+    heldAt: overrides.heldAt || null,
   };
 
   projectCache.set(project.id, project);
@@ -146,6 +147,7 @@ export function archiveProject(id) {
 
   project.archived = true;
   project.archivedAt = new Date().toISOString();
+  project.heldAt = null;
   serialize(project, 'put');
   return project;
 }
@@ -158,6 +160,22 @@ export function unarchiveProject(id) {
 
   project.archived = false;
   project.archivedAt = null;
+  serialize(project, 'put');
+  return project;
+}
+
+export function holdProject(id) {
+  const project = getProject(id);
+  if (!project) throw new Error(ERROR_PROJECT_NOT_FOUND);
+  project.heldAt = Date.now();
+  serialize(project, 'put');
+  return project;
+}
+
+export function restoreProject(id) {
+  const project = getProject(id);
+  if (!project) throw new Error(ERROR_PROJECT_NOT_FOUND);
+  project.heldAt = null;
   serialize(project, 'put');
   return project;
 }

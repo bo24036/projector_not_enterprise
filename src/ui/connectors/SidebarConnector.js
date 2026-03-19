@@ -3,12 +3,15 @@ import { focusAutofocusElement } from '../../utils/domHelpers.js';
 import { ProjectListItem } from '../components/ProjectListItem.js';
 import { ProjectNewItem } from '../components/ProjectNewItem.js';
 import { ProjectInput } from '../components/ProjectInput.js';
-import { SuppressNamesModal } from '../components/SuppressNamesModal.js';
+import { SettingsModal } from '../components/SuppressNamesModal.js';
 import * as Project from '../../domains/Project.js';
 import * as Task from '../../domains/Task.js';
 import * as Person from '../../domains/Person.js';
+import * as Settings from '../../domains/Settings.js';
 import { dispatch } from '../../state.js';
 import { navigateToProject, navigateToOverview, navigateToPersonal } from '../../utils/router.js';
+
+const MS_PER_DAY = 86400000;
 
 export function initSidebarConnector(containerSelector, state) {
   const container = document.querySelector(containerSelector);
@@ -17,24 +20,28 @@ export function initSidebarConnector(containerSelector, state) {
   const allProjects = Project.getAllProjects() || [];
   const activeProjects = allProjects.filter(p => !p.archived);
   const archivedProjects = allProjects.filter(p => p.archived);
+  const holdReviewDays = Settings.getHoldReviewDays();
+
+  // Non-held active projects drive overview counts, urgency, progress
+  const nonHeldProjects = activeProjects.filter(p => p.heldAt === null);
 
   const personalTaskCount = Task.getOpenTaskCount(null);
-  const overviewTaskCount = activeProjects.reduce((sum, p) => sum + Task.getOpenTaskCount(p.id), 0) + personalTaskCount;
+  const overviewTaskCount = nonHeldProjects.reduce((sum, p) => sum + Task.getOpenTaskCount(p.id), 0) + personalTaskCount;
 
   const URGENCY_RANK = { red: 0, orange: 1, yellow: 2, gray: 3 };
   const personalUrgency = Task.getProjectUrgency(null);
-  const overviewUrgency = [...activeProjects.map(p => Task.getProjectUrgency(p.id)), personalUrgency]
+  const overviewUrgency = [...nonHeldProjects.map(p => Task.getProjectUrgency(p.id)), personalUrgency]
     .reduce((worst, u) => URGENCY_RANK[u] < URGENCY_RANK[worst] ? u : worst, 'gray');
 
   const personalProgress = Task.getProjectProgress(null);
-  const allOverviewTasks = [...activeProjects.flatMap(p => Task.getTasksByProjectId(p.id)), ...Task.getPersonalTasks()];
+  const allOverviewTasks = [...nonHeldProjects.flatMap(p => Task.getTasksByProjectId(p.id)), ...Task.getPersonalTasks()];
   const overviewProgress = allOverviewTasks.length === 0 ? null
     : Math.round(allOverviewTasks.filter(t => t.completed).length / allOverviewTasks.length * 100);
 
   const allNames = Person.getAllUniquePersonNamesRaw() || [];
   const suppressedNames = Person.getSuppressedNames();
 
-  // Create new project item (Archive button)
+  // Create new project item
   const newProjectItem = state.isCreatingProject
     ? ProjectInput({
         onSave: handleSave,
@@ -84,16 +91,20 @@ export function initSidebarConnector(containerSelector, state) {
       </button>
 
       <div class="sidebar__list">
-        ${activeProjects.map(project =>
-          ProjectListItem({
+        ${activeProjects.map(project => {
+          const isHeld = project.heldAt !== null;
+          const isReviewDue = isHeld && (Date.now() - project.heldAt > holdReviewDays * MS_PER_DAY);
+          return ProjectListItem({
             project,
             isSelected: state.currentProjectId === project.id,
-            openTaskCount: Task.getOpenTaskCount(project.id),
-            urgency: Task.getProjectUrgency(project.id),
-            progress: Task.getProjectProgress(project.id),
+            openTaskCount: isHeld ? 0 : Task.getOpenTaskCount(project.id),
+            urgency: isHeld ? null : Task.getProjectUrgency(project.id),
+            progress: isHeld ? null : Task.getProjectProgress(project.id),
+            isHeld,
+            isReviewDue,
             onSelect: () => navigateToProject(project.id),
-          })
-        )}
+          });
+        })}
         ${newProjectItem}
       </div>
 
@@ -107,18 +118,23 @@ export function initSidebarConnector(containerSelector, state) {
 
       <div class="sidebar__footer">
         <button class="sidebar__suppress-btn"
-          @click=${() => dispatch({ type: 'OPEN_SUPPRESS_NAMES_MODAL' })}>
-          Suppress Names
+          @click=${() => dispatch({ type: 'OPEN_SETTINGS_MODAL' })}>
+          Settings
         </button>
       </div>
     </div>
 
-    ${state.showSuppressNamesModal
-      ? SuppressNamesModal({
+    ${state.showSettingsModal
+      ? SettingsModal({
           allNames,
           suppressedNames,
-          onSave: (names) => dispatch({ type: 'UPDATE_SUPPRESSED_NAMES', payload: { names } }),
-          onClose: () => dispatch({ type: 'CLOSE_SUPPRESS_NAMES_MODAL' }),
+          holdReviewDays,
+          onSave: (names, days) => {
+            dispatch({ type: 'UPDATE_SUPPRESSED_NAMES', payload: { names } });
+            dispatch({ type: 'UPDATE_HOLD_REVIEW_DAYS', payload: { days } });
+            dispatch({ type: 'CLOSE_SETTINGS_MODAL' });
+          },
+          onClose: () => dispatch({ type: 'CLOSE_SETTINGS_MODAL' }),
         })
       : ''
     }
@@ -130,7 +146,7 @@ export function initSidebarConnector(containerSelector, state) {
 
   // Call showModal() on the dialog when it's visible
   requestAnimationFrame(() => {
-    if (state.showSuppressNamesModal) {
+    if (state.showSettingsModal) {
       const dialog = container.querySelector('.suppress-modal');
       if (dialog && !dialog.open) {
         dialog.showModal();
