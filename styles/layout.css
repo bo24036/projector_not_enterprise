@@ -91,6 +91,7 @@
 .project-progress-ring {
   --ring-fill: var(--color-primary);
   --ring-track: rgba(128, 128, 128, 0.35);
+  --ring-border: var(--color-border);
   display: block;
   width: 18px;
   height: 18px;
@@ -101,6 +102,7 @@
   );
   mask: radial-gradient(farthest-side, transparent 50%, black 50%);
   -webkit-mask: radial-gradient(farthest-side, transparent 50%, black 50%);
+  box-shadow: 0 0 0 1.5px var(--ring-border);
   flex-shrink: 0;
 }
 
@@ -109,6 +111,7 @@
 .sidebar__personal-btn.is-active .project-progress-ring {
   --ring-fill: rgba(255, 255, 255, 0.9);
   --ring-track: rgba(255, 255, 255, 0.3);
+  --ring-border: rgba(255, 255, 255, 0.5);
 }
 
 .project-list-item.is-selected .project-list-item__button {
