@@ -89,22 +89,21 @@
 }
 
 .project-progress-ring-border {
-  --ring-border: var(--color-border);
   display: flex;
   border-radius: 50%;
-  border: 1.5px solid var(--ring-border);
+  border: 2px solid var(--color-text-secondary);
   flex-shrink: 0;
 }
 
 .project-list-item.is-selected .project-progress-ring-border,
 .sidebar__overview-btn.is-active .project-progress-ring-border,
 .sidebar__personal-btn.is-active .project-progress-ring-border {
-  --ring-border: rgba(255, 255, 255, 0.5);
+  border-color: rgba(0, 0, 0, 0.3);
 }
 
 .project-progress-ring {
   --ring-fill: var(--color-primary);
-  --ring-track: rgba(128, 128, 128, 0.35);
+  --ring-track: rgba(128, 128, 128, 0.55);
   display: block;
   width: 18px;
   height: 18px;
@@ -121,8 +120,8 @@
 .project-list-item.is-selected .project-progress-ring,
 .sidebar__overview-btn.is-active .project-progress-ring,
 .sidebar__personal-btn.is-active .project-progress-ring {
-  --ring-fill: rgba(255, 255, 255, 0.9);
-  --ring-track: rgba(255, 255, 255, 0.3);
+  --ring-fill: rgba(255, 255, 255, 0.95);
+  --ring-track: rgba(255, 255, 255, 0.4);
 }
 
 .project-list-item.is-selected .project-list-item__button {
