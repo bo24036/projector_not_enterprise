@@ -1,4 +1,4 @@
-# Installing Projector
+# Installing Projector — Mac
 
 ## Step 1 — Copy the app to your computer
 
@@ -7,7 +7,7 @@ Copy the entire `projector` folder from the shared drive into your `/Application
 Your folder structure should look like:
 ```
 /Applications/Projector/
-  launch-mac.command
+  install/
   index.html
   src/
   styles/
@@ -16,7 +16,7 @@ Your folder structure should look like:
 
 ## Step 2 — First launch
 
-1. Open `/Applications/Projector/` in Finder
+1. Open `/Applications/Projector/install/mac/` in Finder
 2. Double-click **launch-mac.command**
 3. If you see a security warning: right-click the file → Open → Open (you only need to do this once)
 4. Projector opens in its own Chrome window with no tabs or address bar
@@ -25,14 +25,14 @@ Your folder structure should look like:
 
 ## Step 3 — Add to Dock
 
-Drag **launch-mac.command** from `/Applications/Projector/` into your Dock. From then on, clicking it starts the server (if not already running) and opens Projector in Chrome.
+Drag **launch-mac.command** from `/Applications/Projector/install/mac/` into your Dock. From then on, clicking it starts the server (if not already running) and opens Projector in Chrome.
 
 ## Step 4 — Start automatically on login (recommended)
 
 This keeps the server running in the background so Projector is always ready when you click the Dock icon.
 
 1. System Settings → General → Login Items
-2. Click **+** and add `/Applications/Projector/launch-mac.command`
+2. Click **+** and add `/Applications/Projector/install/mac/launch-mac.command`
 
 ## Your data
 
