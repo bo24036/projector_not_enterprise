@@ -28,4 +28,12 @@ rsync -a \
 echo "Removing test files..."
 find "$DEPLOY/src" -name "*.test.js" -delete
 
-echo "Done. Deploy output is in deploy/"
+echo "Writing version.json..."
+if git -C "$ROOT" rev-parse --short HEAD > /dev/null 2>&1; then
+  VERSION=$(git -C "$ROOT" rev-parse --short HEAD)
+else
+  VERSION=$(date +%s)
+fi
+echo "{ \"version\": \"$VERSION\", \"builtAt\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\" }" > "$DEPLOY/version.json"
+
+echo "Done. Deploy output is in deploy/ (version: $VERSION)"
