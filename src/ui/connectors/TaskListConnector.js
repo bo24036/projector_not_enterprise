@@ -10,7 +10,7 @@ export function TaskListConnector({ projectId, state }) {
   const tasks = Task.getTasksByProjectId(projectId);
   const project = Project.getProject(projectId);
   const isArchived = project?.archived ?? false;
-  const { creatingTask, editingTaskId } = state;
+  const { creatingTask, creatingTaskName, creatingTaskDueDate, editingTaskId } = state;
   const editingTask = editingTaskId ? Task.getTask(editingTaskId) : null;
 
   return html`
@@ -51,6 +51,8 @@ export function TaskListConnector({ projectId, state }) {
         : ''}
 
       ${!isArchived ? (creatingTask ? TaskInput({
+        nameValue: creatingTaskName,
+        dueDateValue: creatingTaskDueDate,
         onSave: (name, dueDate) => {
           dispatch({
             type: 'CREATE_TASK',

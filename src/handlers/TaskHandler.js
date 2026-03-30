@@ -1,5 +1,5 @@
 import * as Task from '../domains/Task.js';
-import { registerHandler, dispatch } from '../state.js';
+import { registerHandler } from '../state.js';
 import { createToggleCreateHandler, createEditHandlers, createNoOpLoadedHandler } from '../utils/handlerFactory.js';
 
 registerHandler('CREATE_TASK', (state, action) => {
@@ -7,10 +7,7 @@ registerHandler('CREATE_TASK', (state, action) => {
 
   try {
     Task.createTask(projectId, name, dueDate);
-    return {
-      state: { ...state, creatingTask: false },
-      effects: [() => dispatch({ type: 'START_CREATE_TASK' })],
-    };
+    return { state: { ...state, creatingTask: true, creatingTaskName: '', creatingTaskDueDate: '' } };
   } catch (error) {
     return {
       state: {

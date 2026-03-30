@@ -1,5 +1,5 @@
 import * as Note from '../domains/Note.js';
-import { registerHandler, dispatch } from '../state.js';
+import { registerHandler } from '../state.js';
 import { createToggleCreateHandler, createEditHandlers, createNoOpLoadedHandler, createMutationHandler } from '../utils/handlerFactory.js';
 
 registerHandler('CREATE_NOTE', (state, action) => {
@@ -7,10 +7,7 @@ registerHandler('CREATE_NOTE', (state, action) => {
 
   try {
     Note.createNote(projectId, content, link);
-    return {
-      state: { ...state, creatingNote: false },
-      effects: [() => dispatch({ type: 'START_CREATE_NOTE' })],
-    };
+    return { state: { ...state, creatingNote: true, creatingNoteContent: '', creatingNoteLink: '' } };
   } catch (error) {
     return {
       state: {

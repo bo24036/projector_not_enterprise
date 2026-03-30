@@ -1,6 +1,6 @@
 import * as Person from '../domains/Person.js';
 import * as Settings from '../domains/Settings.js';
-import { registerHandler, dispatch } from '../state.js';
+import { registerHandler } from '../state.js';
 import { createToggleCreateHandler, createEditHandlers, createNoOpLoadedHandler } from '../utils/handlerFactory.js';
 
 registerHandler('CREATE_PERSON', (state, action) => {
@@ -8,10 +8,7 @@ registerHandler('CREATE_PERSON', (state, action) => {
 
   try {
     Person.createPerson(projectId, name, role);
-    return {
-      state: { ...state, creatingPerson: false },
-      effects: [() => dispatch({ type: 'START_CREATE_PERSON' })],
-    };
+    return { state: { ...state, creatingPerson: true, creatingPersonName: '', creatingPersonRole: '' } };
   } catch (error) {
     return {
       state: {

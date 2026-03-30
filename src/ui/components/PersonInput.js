@@ -2,9 +2,9 @@ import { html } from '/vendor/lit-html/lit-html.js';
 import { makeKeyDownHandler, makeBlurHandler } from '../../utils/inputHandlers.js';
 import { makeDatalistId } from '../../utils/domUtils.js';
 
-export function PersonInput({ onSave, onCancel, nameOptions = [], roleOptions = [] }) {
-  let nameValue = '';
-  let roleValue = '';
+export function PersonInput({ onSave, onCancel, nameValue: initialName = '', roleValue: initialRole = '', nameOptions = [], roleOptions = [] }) {
+  let nameValue = initialName;
+  let roleValue = initialRole;
 
   const handleKeyDown = makeKeyDownHandler({
     primaryFieldGetter: () => nameValue,

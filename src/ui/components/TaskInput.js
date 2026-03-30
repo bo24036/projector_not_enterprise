@@ -1,9 +1,9 @@
 import { html } from '/vendor/lit-html/lit-html.js';
 import { makeKeyDownHandler, makeBlurHandler } from '../../utils/inputHandlers.js';
 
-export function TaskInput({ onSave, onCancel }) {
-  let nameValue = '';
-  let dueDateValue = '';
+export function TaskInput({ onSave, onCancel, nameValue: initialName = '', dueDateValue: initialDueDate = '' }) {
+  let nameValue = initialName;
+  let dueDateValue = initialDueDate;
 
   const handleKeyDown = makeKeyDownHandler({
     primaryFieldGetter: () => nameValue,

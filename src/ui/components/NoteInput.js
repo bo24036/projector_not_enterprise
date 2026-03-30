@@ -1,9 +1,9 @@
 import { html } from '/vendor/lit-html/lit-html.js';
 import { makeKeyDownHandler, makeBlurHandler } from '../../utils/inputHandlers.js';
 
-export function NoteInput({ onSave, onCancel }) {
-  let contentValue = '';
-  let linkValue = '';
+export function NoteInput({ onSave, onCancel, contentValue: initialContent = '', linkValue: initialLink = '' }) {
+  let contentValue = initialContent;
+  let linkValue = initialLink;
 
   const handleKeyDown = makeKeyDownHandler({
     primaryFieldGetter: () => contentValue,

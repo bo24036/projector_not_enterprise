@@ -9,7 +9,7 @@ export function NoteListConnector({ projectId, state }) {
   const notes = Note.getNotesByProjectId(projectId);
   const project = Project.getProject(projectId);
   const isArchived = project?.archived ?? false;
-  const { creatingNote, editingNoteId } = state;
+  const { creatingNote, creatingNoteContent, creatingNoteLink, editingNoteId } = state;
   const editingNote = editingNoteId ? Note.getNote(editingNoteId) : null;
 
   return html`
@@ -33,6 +33,8 @@ export function NoteListConnector({ projectId, state }) {
       })}
 
       ${!isArchived ? (creatingNote ? NoteInput({
+        contentValue: creatingNoteContent,
+        linkValue: creatingNoteLink,
         onSave: (content, link) => dispatch({ type: 'CREATE_NOTE', payload: { projectId, content, link } }),
         onCancel: () => dispatch({ type: 'CANCEL_CREATE_NOTE' }),
       }) : html`
