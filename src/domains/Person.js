@@ -186,6 +186,19 @@ export function getAllPeopleForAutocomplete() {
   return { names, roles };
 }
 
+export async function reloadAllPeople() {
+  personCache.clear();
+  projectIdIndex.clear();
+  _allPeopleLoaded = false;
+  return preloadAllPeople();
+}
+
+export async function reloadSuppressedNames() {
+  suppressedNamesCache.clear();
+  _suppressedNamesLoaded = false;
+  return preloadSuppressedNames();
+}
+
 export async function preloadAllPeople() {
   if (_allPeopleLoaded) return;
 

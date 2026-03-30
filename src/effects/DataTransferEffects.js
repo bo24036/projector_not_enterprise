@@ -63,8 +63,8 @@ export async function importData(file) {
 
     // Reload all domain caches from fresh IDB state
     await Project.reloadAllProjects();
-    await Person.preloadAllPeople();
-    await Person.preloadSuppressedNames();
+    await Person.reloadAllPeople();
+    await Person.reloadSuppressedNames();
     await Settings.preloadSettings();
 
     dispatch({ type: 'IMPORT_COMPLETE' });
