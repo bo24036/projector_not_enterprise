@@ -20,6 +20,7 @@ Your folder structure should look like:
 2. Double-click **launch-mac.command**
 3. If you see a security warning: right-click the file → Open → Open (you only need to do this once)
 4. Projector opens in its own Chrome window with no tabs or address bar
+5. A Terminal window will open briefly — you can close it (Cmd+W). If it asks about terminating processes, click **Terminate** — this is harmless and won't affect the running app.
 
 > **Requirement:** Python 3 must be installed — it almost certainly already is on your Mac. If you get an error, download Python from [python.org](https://python.org).
 
