@@ -6,10 +6,19 @@ export function PersonInput({ onSave, onCancel, nameOptions = [], roleOptions = 
   let nameValue = '';
   let roleValue = '';
 
+  function handleSave() {
+    const name = nameValue.trim();
+    const role = roleValue.trim();
+    nameValue = '';
+    roleValue = '';
+    document.querySelectorAll('.person-list-item--creating input').forEach(el => { el.value = ''; });
+    onSave(name, role);
+  }
+
   const handleKeyDown = makeKeyDownHandler({
     primaryFieldGetter: () => nameValue,
     fieldValuesGetter: () => [nameValue.trim(), roleValue.trim()],
-    onSave,
+    onSave: handleSave,
     onCancel,
   });
 
@@ -63,7 +72,7 @@ export function PersonInput({ onSave, onCancel, nameOptions = [], roleOptions = 
       <div class="person-input__controls">
         <button
           class="button-ok"
-          @click=${() => onSave(nameValue.trim(), roleValue.trim())}
+          @click=${handleSave}
           title="Save"
         >
           ✓

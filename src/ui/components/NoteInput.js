@@ -5,10 +5,19 @@ export function NoteInput({ onSave, onCancel }) {
   let contentValue = '';
   let linkValue = '';
 
+  function handleSave() {
+    const content = contentValue.trim();
+    const link = linkValue.trim();
+    contentValue = '';
+    linkValue = '';
+    document.querySelectorAll('.note-list-item--creating input').forEach(el => { el.value = ''; });
+    onSave(content, link);
+  }
+
   const handleKeyDown = makeKeyDownHandler({
     primaryFieldGetter: () => contentValue,
     fieldValuesGetter: () => [contentValue.trim(), linkValue.trim()],
-    onSave,
+    onSave: handleSave,
     onCancel,
   });
 
@@ -50,7 +59,7 @@ export function NoteInput({ onSave, onCancel }) {
       <div class="note-input__controls">
         <button
           class="button-ok"
-          @click=${() => onSave(contentValue.trim(), linkValue.trim())}
+          @click=${handleSave}
           title="Save"
         >
           ✓
