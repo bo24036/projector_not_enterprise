@@ -29,7 +29,20 @@ Projector opens in its own Chrome window with no tabs or address bar.
 
 ## Step 3 — Pin to Taskbar
 
-While Projector is open, right-click the Chrome icon in your taskbar → **Pin** (wording varies by desktop environment).
+With Projector open, pin the launcher to your taskbar or dock so you can relaunch it without a terminal:
+
+**GNOME (Ubuntu default):**
+Right-click the Chrome icon in the Dock → **Pin to Dash**
+
+**KDE Plasma:**
+Right-click the Chrome icon in the taskbar → **Pin to Task Manager**
+
+**XFCE:**
+Right-click the Chrome icon in the panel → **Lock to Taskbar**
+
+**Other desktops:** Look for "Pin", "Lock", or "Keep in panel" in the right-click menu on the taskbar icon.
+
+> The pinned icon launches Chrome to `localhost:7337`. Make sure the server is running first (Step 4 below handles that automatically on login).
 
 ## Step 4 — Start automatically on login (recommended)
 

@@ -25,7 +25,13 @@ Your folder structure should look like:
 
 ## Step 3 — Add to Dock
 
-Drag **launch-mac.command** from `/Applications/Projector/install/mac/` into your Dock. From then on, clicking it starts the server (if not already running) and opens Projector in Chrome.
+1. Open `/Applications/Projector/install/mac/` in Finder
+2. Drag **launch-mac.command** to the right-hand side of your Dock (the section after the separator, where documents and folders live)
+3. It will appear as a script icon in the Dock
+
+From then on, clicking it starts the server (if not already running) and opens Projector in its own Chrome window.
+
+> **Tip:** If you'd prefer it in the app section of the Dock (left of the separator), launch it first so it appears in the Dock, then right-click the bouncing icon → **Options** → **Keep in Dock**.
 
 ## Step 4 — Start automatically on login (recommended)
 
