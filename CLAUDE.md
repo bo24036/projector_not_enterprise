@@ -6,7 +6,7 @@
 > - NO CLASSES / NO OOP: No class, this, or new. Use POJOs and exported functions.
 > - NO BUILD STEP / ESM ONLY: All imports must use the .js extension (e.g., import { x } from './file.js').
 > - VANILLA LIT-HTML: Use html tagged templates via CDN.
-> - LIBRARY PHILOSOPHY: CDN-ready only. Minimize dependencies. Approved: workbox (Service Workers) and idb (IndexedDB).
+> - LIBRARY PHILOSOPHY: CDN-ready only. Minimize dependencies. Approved: idb (IndexedDB).
 > - ZERO DOMAIN COUPLING: A Domain module must never import another Domain module.
 > - NO MAGIC VALUES: use constants instead of bare values.
 
@@ -92,13 +92,6 @@ State changes follow a synchronous-to-deferred pipeline to prevent re-entrancy:
   - Exception: Only with explicit user approval. Before using position: absolute, describe the use case and ask for confirmation.
 - HTML-First: Use native HTML capabilities (autofocus, disabled, form elements, semantic tags) before CSS solutions.
 
-## Service Worker & Cache Strategy
-
-App is fully offline with no backend.
-
-- **Source of Truth:** IndexedDB. In-memory cache is write-through synced with IDB.
-- **Service Worker:** Caches JS/CSS for offline access only — not a data source.
-- **Cache Invalidation:** Increment `SW_VERSION` in main.js when modifying service-worker.js, refactoring JS, adding CSS files, or changing data formats.
 
 ## Implementation Contracts
 
