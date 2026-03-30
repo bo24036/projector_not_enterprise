@@ -12,6 +12,7 @@ close_terminal() {
 # If server already running, just open Chrome
 if lsof -ti tcp:$PORT > /dev/null 2>&1; then
   "$CHROME" --app="$URL" --user-data-dir="$APP_DIR/.chrome-profile" > /dev/null 2>&1 &
+  disown
   close_terminal
   exit 0
 fi
@@ -21,8 +22,10 @@ cd "$APP_DIR"
 # Start server in background, wait for it to be ready, then open Chrome
 if command -v python3 > /dev/null 2>&1; then
   python3 -m http.server $PORT 2>/dev/null &
+  disown
 elif command -v python > /dev/null 2>&1; then
   python -m SimpleHTTPServer $PORT &
+  disown
 elif command -v node > /dev/null 2>&1; then
   node -e "
     const http = require('http');
@@ -38,6 +41,7 @@ elif command -v node > /dev/null 2>&1; then
       });
     }).listen($PORT);
   " &
+  disown
 else
   osascript -e 'display alert "Projector could not start" message "Python or Node.js is required. Please install Python from python.org and try again."'
   exit 1
@@ -54,4 +58,5 @@ while ! lsof -ti tcp:$PORT > /dev/null 2>&1; do
   fi
 done
 "$CHROME" --app="$URL" --user-data-dir="$APP_DIR/.chrome-profile" > /dev/null 2>&1 &
+disown
 close_terminal
