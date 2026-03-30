@@ -38,8 +38,14 @@ else
   exit 1
 fi
 
-# Wait until server is accepting connections, then open Chrome
+# Wait until server is accepting connections (max 10 seconds), then open Chrome
+WAIT=0
 while ! lsof -ti tcp:$PORT > /dev/null 2>&1; do
   sleep 0.1
+  WAIT=$((WAIT + 1))
+  if [ $WAIT -ge 100 ]; then
+    osascript -e 'display alert "Projector could not start" message "The server failed to start. Please try again or check that Python is installed correctly."'
+    exit 1
+  fi
 done
 "$CHROME" --app="$URL" --user-data-dir="$APP_DIR/.chrome-profile" > /dev/null 2>&1 &
