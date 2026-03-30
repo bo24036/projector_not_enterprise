@@ -20,6 +20,7 @@ rsync -a \
   --include="index.html" \
   --include="favicon.ico" \
   --include="manifest.json" \
+  --include="INSTALL.md" \
   --exclude="*" \
   "$ROOT/" "$DEPLOY/"
 
