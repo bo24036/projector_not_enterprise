@@ -47,4 +47,7 @@ while ! lsof -ti tcp:$PORT > /dev/null 2>&1; do
   fi
 done
 "$CHROME" --app="$URL" --user-data-dir="$APP_DIR/.chrome-profile" > /dev/null 2>&1 &
-exit 0
+echo ""
+echo "Projector is running. You can close this window (click the red dot or press Cmd+W)."
+echo "If asked about terminating processes, click Terminate — it won't affect the app."
+echo ""
