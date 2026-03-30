@@ -1,6 +1,7 @@
 #!/bin/bash
 PORT=7337
-APP_DIR="$(cd "$(dirname "$0")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+APP_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 URL="http://localhost:$PORT"
 
 open_chrome() {
