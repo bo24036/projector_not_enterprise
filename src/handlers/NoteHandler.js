@@ -9,7 +9,7 @@ registerHandler('CREATE_NOTE', (state, action) => {
     Note.createNote(projectId, content, link);
     return {
       state: { ...state, creatingNote: false },
-      effects: [() => dispatch({ type: 'START_CREATE_NOTE' })],
+      effects: [() => requestAnimationFrame(() => dispatch({ type: 'START_CREATE_NOTE' }))],
     };
   } catch (error) {
     return {

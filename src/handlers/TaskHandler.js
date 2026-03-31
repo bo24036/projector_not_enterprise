@@ -9,7 +9,7 @@ registerHandler('CREATE_TASK', (state, action) => {
     Task.createTask(projectId, name, dueDate);
     return {
       state: { ...state, creatingTask: false },
-      effects: [() => dispatch({ type: 'START_CREATE_TASK' })],
+      effects: [() => requestAnimationFrame(() => dispatch({ type: 'START_CREATE_TASK' }))],
     };
   } catch (error) {
     return {

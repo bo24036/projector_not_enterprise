@@ -8,7 +8,9 @@ lit-html reuses DOM nodes across renders and tracks the last value it set on pro
 
 ## Decision
 
-On a successful `CREATE_*` action, the handler sets `creatingX: false` and returns an effect that dispatches `START_CREATE_*`. This causes two renders: one where the placeholder replaces the form (node destroyed), and one where the fresh form replaces the placeholder (new node, blank inputs).
+On a successful `CREATE_*` action, the handler sets `creatingX: false` and returns an effect that wraps `START_CREATE_*` in a `requestAnimationFrame`. This guarantees two separate renders: the first (from the handler's state change) destroys the form node and renders the placeholder; the rAF fires after that render completes and dispatches `START_CREATE_*`, which renders a fresh form node with blank inputs.
+
+The `requestAnimationFrame` wrapper is required because effects run via `queueMicrotask`, which fires before the rAF render. Without it, `creatingX` would flip false→true before any render, the node would never be destroyed, and the inputs would not clear.
 
 ## Rationale
 
