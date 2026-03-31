@@ -88,6 +88,10 @@ export function _getHandlerForTesting(actionType) {
   return handlers[actionType];
 }
 
+export function getHandlerKeys() {
+  return Object.keys(handlers);
+}
+
 // Error handling
 registerHandler('SET_ERROR', (state, action) => {
   const { actionType, message, entityId } = action.payload;

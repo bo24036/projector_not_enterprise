@@ -16,6 +16,7 @@ import { render, nothing } from '/vendor/lit-html/lit-html.js';
 import { initRouter } from './utils/router.js';
 import { initKeyboardShortcuts } from './utils/keyboardShortcuts.js';
 import { getState, setRootRenderer } from './state.js';
+import { initDebug } from './utils/debug.js';
 import { idbReady } from './utils/IdbService.js';
 import * as Project from './domains/Project.js';
 import * as Person from './domains/Person.js';
@@ -72,6 +73,9 @@ async function initApp() {
 
   // Register root renderer before router init so initial navigation triggers render
   setRootRenderer(renderApp);
+
+  // Expose debug tools on window.__projector
+  initDebug();
 
   // Register global keyboard shortcuts
   initKeyboardShortcuts();
