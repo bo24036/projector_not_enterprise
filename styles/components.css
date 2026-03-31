@@ -258,6 +258,24 @@
   min-width: 140px;
 }
 
+.year-end-report__project-link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-primary);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.year-end-report__project-link:hover {
+  color: var(--color-primary-hover, var(--color-primary));
+  text-decoration: none;
+}
+
 .year-end-report__td--desc {
   color: var(--color-text-secondary);
   min-width: 200px;

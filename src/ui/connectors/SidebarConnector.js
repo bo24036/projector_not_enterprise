@@ -79,10 +79,6 @@ export function initSidebarConnector(containerSelector, state) {
         ${personalTaskCount > 0 ? html`<span class="sidebar__count">${personalTaskCount}</span>` : ''}
       </button>
 
-      <button class="sidebar__report-btn ${state.currentPage === 'yearEndReport' ? 'is-active' : ''}" @click=${navigateToReport}>
-        Year-End Report
-      </button>
-
       <div class="sidebar__list">
         ${activeProjects.map(project => {
           const isHeld = project.heldAt !== null;
@@ -107,6 +103,10 @@ export function initSidebarConnector(containerSelector, state) {
         </button>
         ${archivedList}
       </div>
+
+      <button class="sidebar__report-btn ${state.currentPage === 'yearEndReport' ? 'is-active' : ''}" @click=${navigateToReport}>
+        Year-End Report
+      </button>
 
       <div class="sidebar__footer">
         <button class="sidebar__suppress-btn"

@@ -43,7 +43,9 @@ export function YearEndReportPage({ year, rows, onYearChange }) {
               <tbody>
                 ${rows.map(row => html`
                   <tr class="year-end-report__row">
-                    <td class="year-end-report__td year-end-report__td--name">${row.name}</td>
+                    <td class="year-end-report__td year-end-report__td--name">
+                      <button class="year-end-report__project-link" @click=${row.onProjectClick}>${row.name}</button>
+                    </td>
                     <td class="year-end-report__td year-end-report__td--desc">${row.description || '—'}</td>
                     <td class="year-end-report__td year-end-report__td--num">${row.completedTasks} / ${row.totalTasks}</td>
                     <td class="year-end-report__td">${row.startDate}</td>

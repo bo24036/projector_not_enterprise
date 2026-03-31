@@ -3,6 +3,7 @@ import { YearEndReportPage } from '../components/YearEndReportPage.js';
 import * as Project from '../../domains/Project.js';
 import * as Task from '../../domains/Task.js';
 import { dispatch } from '../../state.js';
+import { navigateToProject } from '../../utils/router.js';
 
 function getProjectsActiveInYear(allProjects, year) {
   const janFirst = new Date(year, 0, 1).getTime();
@@ -50,6 +51,7 @@ export function initYearEndReportConnector(containerSelector, state) {
       totalTasks: tasks.length,
       startDate: formatDate(project.createdAt),
       endDate: project.archivedAt ? formatDate(project.archivedAt) : 'Active',
+      onProjectClick: () => navigateToProject(project.id),
     };
   });
 
