@@ -30,8 +30,19 @@ registerHandler('CREATE_READING_LIST_ITEM', (state, action) => {
   }
 });
 
-createMutationHandler('UPDATE_READING_LIST_ITEM', ({ itemId, content, link, recommendedBy, tags }) => {
-  ReadingList.updateReadingListItem(itemId, { content, link, recommendedBy, tags });
+registerHandler('UPDATE_READING_LIST_ITEM', (state, action) => {
+  const { itemId, content, link, recommendedBy, tags } = action.payload;
+  try {
+    ReadingList.updateReadingListItem(itemId, { content, link, recommendedBy, tags });
+    return { state: { ...state, editingReadingListItemId: null } };
+  } catch (error) {
+    return {
+      state: {
+        ...state,
+        lastError: { actionType: 'UPDATE_READING_LIST_ITEM', message: error.message, timestamp: Date.now() },
+      },
+    };
+  }
 });
 
 createMutationHandler('DELETE_READING_LIST_ITEM', ({ itemId }) => {

@@ -25,7 +25,7 @@ export function ReadingListInput({ onSave, onCancel, recommenderOptions = [], ta
   function syncChips(chipsEl) {
     if (!chipsEl) return;
     allKnownTags().forEach(tag => {
-      let chip = chipsEl.querySelector(`[data-tag="${tag.replace(/"/g, '\\"')}"]`);
+      let chip = Array.from(chipsEl.children).find(el => el.dataset.tag === tag);
       if (!chip) {
         chip = document.createElement('label');
         chip.className = 'reading-list-input__tag-chip';
