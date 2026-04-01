@@ -1,6 +1,6 @@
 import { html } from '/vendor/lit-html/lit-html.js';
 
-export function SettingsModal({ allNames, suppressedNames, holdReviewDays, onSave, onClose }) {
+export function SettingsModal({ allNames, suppressedNames, holdReviewDays, onSave, onClose, onExport, onImport }) {
   const handleSave = (e) => {
     const dialog = e.target.closest('dialog');
     const checked = [...dialog.querySelectorAll('.suppress-modal__checkbox:checked')].map(el => el.value);
@@ -44,6 +44,27 @@ export function SettingsModal({ allNames, suppressedNames, holdReviewDays, onSav
             </li>
           `)}
         </ul>
+      </section>
+
+      <section class="suppress-modal__section">
+        <h3 class="suppress-modal__section-title">Data</h3>
+        <p class="suppress-modal__description">Export a backup of all your data, or import a previously exported file.</p>
+        <div class="suppress-modal__data-actions">
+          <button class="suppress-modal__data-btn" @click=${onExport}>Export</button>
+          <label class="suppress-modal__data-btn suppress-modal__import-label">
+            Import
+            <input
+              type="file"
+              accept=".json"
+              class="suppress-modal__import-input"
+              @change=${(e) => {
+                const file = e.target.files[0];
+                if (file) onImport(file);
+                e.target.value = '';
+              }}
+            />
+          </label>
+        </div>
       </section>
 
       <div class="suppress-modal__controls">

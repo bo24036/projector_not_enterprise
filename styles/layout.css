@@ -809,9 +809,7 @@
 }
 
 .sidebar__report-btn,
-.sidebar__suppress-btn,
-.sidebar__export-btn,
-.sidebar__import-btn {
+.sidebar__suppress-btn {
   width: 100%;
   padding: var(--spacing-sm) var(--spacing-md);
   text-align: left;
@@ -825,9 +823,7 @@
 }
 
 .sidebar__report-btn:hover,
-.sidebar__suppress-btn:hover,
-.sidebar__export-btn:hover,
-.sidebar__import-btn:hover {
+.sidebar__suppress-btn:hover {
   background-color: var(--color-surface-hover);
   color: var(--color-text);
 }
@@ -837,7 +833,32 @@
   font-weight: var(--font-weight-medium);
 }
 
-.sidebar__import-input {
+.suppress-modal__data-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.suppress-modal__data-btn {
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  border: var(--border-width) solid var(--color-border);
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.suppress-modal__data-btn:hover {
+  background-color: var(--color-surface-hover);
+}
+
+.suppress-modal__import-label {
+  display: inline-flex;
+  align-items: center;
+}
+
+.suppress-modal__import-input {
   display: none;
 }
 

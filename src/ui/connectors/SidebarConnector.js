@@ -68,7 +68,7 @@ export function initSidebarConnector(containerSelector, state) {
   const template = html`
     <div class="sidebar">
       <div class="sidebar__header">
-        <h1 class="sidebar__title">Projects</h1>
+        <h1 class="sidebar__title">Projector</h1>
       </div>
 
       <button class="sidebar__overview-btn urgency-${overviewUrgency} ${state.currentPage === 'overview' ? 'is-active' : ''}" @click=${navigateToOverview}>
@@ -121,24 +121,6 @@ export function initSidebarConnector(containerSelector, state) {
           @click=${() => dispatch({ type: 'OPEN_SETTINGS_MODAL' })}>
           Settings
         </button>
-        <button class="sidebar__export-btn"
-          @click=${() => dispatch({ type: 'EXPORT_DATA' })}>
-          Export
-        </button>
-        <input
-          type="file"
-          accept=".json"
-          class="sidebar__import-input"
-          @change=${(e) => {
-            const file = e.target.files[0];
-            if (file) dispatch({ type: 'IMPORT_DATA', payload: { file } });
-            e.target.value = '';
-          }}
-        />
-        <button class="sidebar__import-btn"
-          @click=${() => container.querySelector('.sidebar__import-input').click()}>
-          Import
-        </button>
       </div>
     </div>
 
@@ -153,6 +135,8 @@ export function initSidebarConnector(containerSelector, state) {
             dispatch({ type: 'CLOSE_SETTINGS_MODAL' });
           },
           onClose: () => dispatch({ type: 'CLOSE_SETTINGS_MODAL' }),
+          onExport: () => dispatch({ type: 'EXPORT_DATA' }),
+          onImport: (file) => dispatch({ type: 'IMPORT_DATA', payload: { file } }),
         })
       : ''
     }
