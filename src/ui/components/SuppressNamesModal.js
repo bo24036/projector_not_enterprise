@@ -1,6 +1,6 @@
 import { html } from '/vendor/lit-html/lit-html.js';
 
-export function SettingsModal({ allNames, suppressedNames, holdReviewDays, onSave, onClose, onExport, onImport }) {
+export function SettingsModal({ allNames, suppressedNames, holdReviewDays, onSave, onClose, onExport, onImport, backupDirName, onSetBackupDir }) {
   const handleSave = (e) => {
     const dialog = e.target.closest('dialog');
     const checked = [...dialog.querySelectorAll('.suppress-modal__checkbox:checked')].map(el => el.value);
@@ -64,6 +64,14 @@ export function SettingsModal({ allNames, suppressedNames, holdReviewDays, onSav
               }}
             />
           </label>
+        </div>
+        <div class="suppress-modal__backup-row">
+          <span class="suppress-modal__backup-dir">
+            ${backupDirName ? `Auto-backup folder: ${backupDirName}` : 'No auto-backup folder set'}
+          </span>
+          <button class="suppress-modal__data-btn" @click=${onSetBackupDir}>
+            ${backupDirName ? 'Change folder' : 'Set backup folder'}
+          </button>
         </div>
       </section>
 

@@ -290,6 +290,9 @@ export async function preloadSuppressedNames() {
   }
 }
 
+// Returns a snapshot of all people currently in the in-memory cache.
+export function snapshotCache() { return Array.from(personCache.values()); }
+
 // Test utility - clears cache and resets state
 export function _resetCacheForTesting() {
   personCache.clear();

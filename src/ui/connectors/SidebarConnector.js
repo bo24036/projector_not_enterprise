@@ -11,6 +11,7 @@ import * as Settings from '../../domains/Settings.js';
 import { dispatch } from '../../state.js';
 import { navigateToProject, navigateToOverview, navigateToPersonal, navigateToReport, navigateToReadingList } from '../../utils/router.js';
 import * as ReadingList from '../../domains/ReadingList.js';
+import { getDirName } from '../../utils/AutoBackup.js';
 
 const MS_PER_DAY = 86400000;
 
@@ -137,6 +138,8 @@ export function initSidebarConnector(containerSelector, state) {
           onClose: () => dispatch({ type: 'CLOSE_SETTINGS_MODAL' }),
           onExport: () => dispatch({ type: 'EXPORT_DATA' }),
           onImport: (file) => dispatch({ type: 'IMPORT_DATA', payload: { file } }),
+          backupDirName: getDirName(),
+          onSetBackupDir: () => dispatch({ type: 'SET_BACKUP_DIR' }),
         })
       : ''
     }

@@ -1,5 +1,5 @@
 import { registerHandler } from '../state.js';
-import { exportData, importData } from '../effects/DataTransferEffects.js';
+import { exportData, importData, setBackupDirEffect } from '../effects/DataTransferEffects.js';
 import { scheduleVersionCheck } from '../utils/versionCheck.js';
 import { createNoOpLoadedHandler } from '../utils/handlerFactory.js';
 
@@ -14,6 +14,13 @@ registerHandler('IMPORT_DATA', (state, action) => {
 
 // Triggers a full re-render after caches have been reloaded by importData
 createNoOpLoadedHandler('IMPORT_COMPLETE');
+
+registerHandler('SET_BACKUP_DIR', (state) => {
+  return { state, effects: [setBackupDirEffect] };
+});
+
+// Triggers re-render so Settings modal updates to show the new folder name
+registerHandler('BACKUP_DIR_SET', (state) => ({ state: { ...state } }));
 
 registerHandler('UPDATE_AVAILABLE', (state) => {
   return { state: { ...state, updateAvailable: true } };

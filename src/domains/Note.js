@@ -199,6 +199,9 @@ export function deleteNote(id) {
   return true;
 }
 
+// Returns a snapshot of all notes currently in the in-memory cache.
+export function snapshotCache() { return Array.from(noteCache.values()); }
+
 // Test utility - clears cache and resets state
 export function _resetCacheForTesting() {
   noteCache.clear();

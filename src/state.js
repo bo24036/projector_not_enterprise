@@ -1,3 +1,5 @@
+import { scheduleBackup } from './utils/AutoBackup.js';
+
 const AUTO_DISMISS_MS = 5000;
 
 const state = {
@@ -72,7 +74,10 @@ export function dispatch(action) {
     // Skip render if handler returned the same state reference (true no-op, e.g. *_LOADED
     // handlers that only update the domain cache). This prevents mid-edit re-renders from
     // async IDB fetches completing while the user is typing in an inline form.
-    if (nextState !== state) setState(nextState);
+    if (nextState !== state) {
+      setState(nextState);
+      scheduleBackup(); // snapshot in-memory caches now, before async IDB writes fire
+    }
 
     effects?.forEach(effect => {
       queueMicrotask(effect);

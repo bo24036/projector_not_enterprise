@@ -326,6 +326,21 @@ export async function deleteReadingListItemFromIdb(id) {
   }
 }
 
+// Fetch the saved backup directory handle from IDB. Returns undefined if not set.
+export async function getBackupDirHandle() {
+  const database = await getDatabase();
+  if (!database) return undefined;
+  const row = await database.get('settings', 'backup-dir-handle');
+  return row?.value;
+}
+
+// Save a FileSystemDirectoryHandle to IDB. Handles are structured-cloneable.
+export async function putBackupDirHandle(handle) {
+  const database = await getDatabase();
+  if (!database) return;
+  await database.put('settings', { id: 'backup-dir-handle', value: handle });
+}
+
 // Clear all records from a store. Used during import.
 export async function clearStore(storeName) {
   const database = await getDatabase();

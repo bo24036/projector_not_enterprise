@@ -20,6 +20,7 @@ import { initKeyboardShortcuts } from './utils/keyboardShortcuts.js';
 import { getState, setRootRenderer } from './state.js';
 import { initDebug } from './utils/debug.js';
 import { idbReady } from './utils/IdbService.js';
+import { initAutoBackup } from './utils/AutoBackup.js';
 import * as Project from './domains/Project.js';
 import * as Person from './domains/Person.js';
 import * as Settings from './domains/Settings.js';
@@ -60,6 +61,9 @@ async function initApp() {
   // Wait for IDB module to be ready before rendering
   // This ensures getAllProjectsFromIdb() has openDB available on hard reload
   await idbReady;
+
+  // Load saved backup directory handle from IDB (no permission request — lazy on first write)
+  await initAutoBackup();
 
   // Pre-load all projects into cache before router initialization
   // This ensures projects are available synchronously for all handlers and connectors

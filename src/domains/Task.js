@@ -366,6 +366,9 @@ export function deleteTask(id) {
   return true;
 }
 
+// Returns a snapshot of all tasks currently in the in-memory cache.
+export function snapshotCache() { return Array.from(taskCache.values()); }
+
 // Test utility - clears cache and resets state
 export function _resetCacheForTesting() {
   taskCache.clear();
