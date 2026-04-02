@@ -16,7 +16,9 @@ export function createMutationHandler(actionName, domainFn) {
   registerHandler(actionName, (state, action) => {
     try {
       domainFn(action.payload);
-      return { state };
+      // Return a new state object (not same reference) so the render is triggered —
+      // the domain cache changed and the UI needs to reflect it.
+      return { state: { ...state } };
     } catch (error) {
       return {
         state: {
@@ -96,14 +98,16 @@ export function createEditHandlers(entityType, config) {
 
 /**
  * Creates a no-op fulfillment handler that passes state unchanged.
- * Used for data-load handlers where the domain cache is already updated;
- * the handler exists only to trigger a re-render via setState.
+ * Used for data-load handlers where the domain cache is already updated.
+ * Returns the same state reference so dispatch skips the re-render —
+ * preventing async IDB fetches from wiping in-progress inline forms.
+ * The next user-initiated action will naturally re-render with fresh cache data.
  *
  * @param {string} actionType - Action type name (e.g., 'TASK_LOADED', 'PROJECTS_LOADED')
  *
  * @example
  * createNoOpLoadedHandler('TASK_LOADED');
- * // Registers: a handler that receives (state) => { state }
+ * // Registers: a handler that receives (state) => { state } (same reference = no render)
  */
 export function createNoOpLoadedHandler(actionType) {
   registerHandler(actionType, (state) => {

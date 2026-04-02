@@ -54,7 +54,7 @@ registerHandler('DELETE_PERSON', (state, action) => {
 
   try {
     Person.deletePerson(personId);
-    return { state };
+    return { state: { ...state } };
   } catch (error) {
     return {
       state: {
@@ -94,7 +94,7 @@ registerHandler('CLOSE_SETTINGS_MODAL', (state) => {
 
 registerHandler('UPDATE_HOLD_REVIEW_DAYS', (state, action) => {
   Settings.setHoldReviewDays(action.payload.days);
-  return { state };
+  return { state: { ...state } };
 });
 
 registerHandler('UPDATE_SUPPRESSED_NAMES', (state, action) => {

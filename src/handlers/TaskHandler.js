@@ -54,7 +54,7 @@ registerHandler('DELETE_TASK', (state, action) => {
 
   try {
     Task.deleteTask(taskId);
-    return { state };
+    return { state: { ...state } };
   } catch (error) {
     return {
       state: {
@@ -75,7 +75,7 @@ registerHandler('TOGGLE_TASK_COMPLETED', (state, action) => {
 
   try {
     Task.toggleTaskCompleted(taskId);
-    return { state };
+    return { state: { ...state } };
   } catch (error) {
     return {
       state: {

@@ -69,7 +69,10 @@ export function dispatch(action) {
 
   try {
     const { state: nextState, effects } = handler(state, action);
-    setState(nextState);
+    // Skip render if handler returned the same state reference (true no-op, e.g. *_LOADED
+    // handlers that only update the domain cache). This prevents mid-edit re-renders from
+    // async IDB fetches completing while the user is typing in an inline form.
+    if (nextState !== state) setState(nextState);
 
     effects?.forEach(effect => {
       queueMicrotask(effect);
