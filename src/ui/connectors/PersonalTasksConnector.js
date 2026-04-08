@@ -6,6 +6,8 @@ import * as Task from '../../domains/Task.js';
 import { dispatch } from '../../state.js';
 import { makeTaskDisplayObject } from '../../utils/taskFormatting.js';
 
+let lastTaskFormKey = null;
+
 export function initPersonalTasksConnector(containerSelector, state) {
   const container = document.querySelector(containerSelector);
   if (!container) return;
@@ -75,6 +77,14 @@ export function initPersonalTasksConnector(containerSelector, state) {
   `;
 
   render(template, container);
+
+  requestAnimationFrame(() => {
+    if (state.creatingTask && state.taskFormKey !== lastTaskFormKey) {
+      lastTaskFormKey = state.taskFormKey;
+      container.querySelectorAll('.task-list-item--creating input').forEach(el => { el.value = ''; });
+      container.querySelector('.task-input__field--name')?.focus();
+    }
+  });
 
   focusAutofocusElement(container);
 }
