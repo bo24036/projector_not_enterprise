@@ -1,4 +1,5 @@
 import { html } from '/vendor/lit-html/lit-html.js';
+import { keyed } from '/vendor/lit-html/directives/keyed.js';
 import { NoteListItem } from '../components/NoteListItem.js';
 import { NoteInput } from '../components/NoteInput.js';
 import * as Note from '../../domains/Note.js';
@@ -9,7 +10,7 @@ export function NoteListConnector({ projectId, state }) {
   const notes = Note.getNotesByProjectId(projectId);
   const project = Project.getProject(projectId);
   const isArchived = project?.archived ?? false;
-  const { creatingNote, editingNoteId } = state;
+  const { creatingNote, editingNoteId, noteFormKey } = state;
   const editingNote = editingNoteId ? Note.getNote(editingNoteId) : null;
 
   return html`
@@ -32,10 +33,10 @@ export function NoteListConnector({ projectId, state }) {
         });
       })}
 
-      ${!isArchived ? (creatingNote ? NoteInput({
+      ${!isArchived ? (creatingNote ? keyed(noteFormKey, NoteInput({
         onSave: (content, link) => dispatch({ type: 'CREATE_NOTE', payload: { projectId, content, link } }),
         onCancel: () => dispatch({ type: 'CANCEL_CREATE_NOTE' }),
-      }) : html`
+      })) : html`
         <div class="note-list-item note-list-item--placeholder">
           <button
             class="note-list-item__placeholder-button"

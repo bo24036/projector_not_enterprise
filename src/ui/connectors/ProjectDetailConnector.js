@@ -14,7 +14,6 @@ import { navigateToOverview } from '../../utils/router.js';
 
 let lastTaskFormKey = null;
 let lastPersonFormKey = null;
-let lastNoteFormKey = null;
 
 export function initProjectDetailConnector(containerSelector, state) {
   const container = document.querySelector(containerSelector);
@@ -155,11 +154,6 @@ export function initProjectDetailConnector(containerSelector, state) {
       lastPersonFormKey = state.personFormKey;
       container.querySelectorAll('.person-list-item--creating input').forEach(el => { el.value = ''; });
       container.querySelector('.person-input__field--name')?.focus();
-    }
-    if (state.creatingNote && state.noteFormKey !== lastNoteFormKey) {
-      lastNoteFormKey = state.noteFormKey;
-      container.querySelectorAll('.note-list-item--creating input').forEach(el => { el.value = ''; });
-      container.querySelector('.note-input__field--content')?.focus();
     }
   });
 
