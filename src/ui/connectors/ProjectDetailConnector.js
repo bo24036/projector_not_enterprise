@@ -10,6 +10,7 @@ import { NoteListConnector } from './NoteListConnector.js';
 import * as Project from '../../domains/Project.js';
 import * as Person from '../../domains/Person.js';
 import * as Settings from '../../domains/Settings.js';
+import { getPersonNameOptions } from '../../utils/getPersonNameOptions.js';
 import { dispatch } from '../../state.js';
 import { navigateToOverview } from '../../utils/router.js';
 
@@ -39,7 +40,8 @@ export function initProjectDetailConnector(containerSelector, state) {
   const isReviewDue = isHeld && (Date.now() - project.heldAt > holdReviewDays * MS_PER_DAY);
 
   const people = Person.getPeopleByProjectId(project.id) || [];
-  const { names: allNames, roles: allRoles } = Person.getAllPeopleForAutocomplete();
+  const { roles: allRoles } = Person.getAllPeopleForAutocomplete();
+  const allNames = getPersonNameOptions();
   const { creatingPerson, editingPersonId, personFormKey } = state;
   const editingPerson = editingPersonId ? Person.getPerson(editingPersonId) : null;
 

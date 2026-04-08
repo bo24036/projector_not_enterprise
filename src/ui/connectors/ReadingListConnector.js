@@ -4,6 +4,7 @@ import { focusAutofocusElement } from '../../utils/domHelpers.js';
 import { ReadingListItem } from '../components/ReadingListItem.js';
 import { ReadingListInput } from '../components/ReadingListInput.js';
 import * as ReadingList from '../../domains/ReadingList.js';
+import { getPersonNameOptions } from '../../utils/getPersonNameOptions.js';
 import { dispatch } from '../../state.js';
 
 export function initReadingListConnector(containerSelector, state) {
@@ -13,7 +14,7 @@ export function initReadingListConnector(containerSelector, state) {
   const { creatingReadingListItem, editingReadingListItemId, showReadingListRead, readingListFormKey } = state;
 
   const allItems = ReadingList.getAllReadingListItems();
-  const recommenderOptions = ReadingList.getRecommenderOptions();
+  const recommenderOptions = getPersonNameOptions();
 
   const searchQuery = state.readingListSearch ?? '';
   const query = searchQuery.toLowerCase();
