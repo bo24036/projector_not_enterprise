@@ -1,12 +1,33 @@
 import { html } from '/vendor/lit-html/lit-html.js';
 
-export function SettingsModal({ allNames, suppressedNames, holdReviewDays, onSave, onClose, onExport, onImport, backupDirName, onSetBackupDir }) {
-  const handleSave = (e) => {
+export function SettingsModal({
+  allNames,
+  suppressedNames,
+  holdReviewDays,
+  onClose,
+  onToggleSuppress,
+  onHoldReviewDaysChange,
+  onExport,
+  onImport,
+  backupDirName,
+  onSetBackupDir,
+}) {
+  let filterValue = '';
+
+  function handleFilterInput(e) {
+    filterValue = e.target.value;
+    const q = filterValue.toLowerCase();
     const dialog = e.target.closest('dialog');
-    const checked = [...dialog.querySelectorAll('.suppress-modal__checkbox:checked')].map(el => el.value);
-    const days = parseInt(dialog.querySelector('.suppress-modal__days-input').value, 10);
-    onSave(checked, isNaN(days) || days < 1 ? holdReviewDays : days);
-  };
+    dialog.querySelectorAll('.suppress-modal__item').forEach(li => {
+      const name = li.dataset.name.toLowerCase();
+      li.hidden = q ? !name.includes(q) : false;
+    });
+  }
+
+  function handleDaysChange(e) {
+    const days = parseInt(e.target.value, 10);
+    if (!isNaN(days) && days >= 1) onHoldReviewDaysChange(days);
+  }
 
   return html`
     <dialog class="suppress-modal" @cancel=${onClose}>
@@ -21,23 +42,35 @@ export function SettingsModal({ allNames, suppressedNames, holdReviewDays, onSav
             type="number"
             min="1"
             .value=${String(holdReviewDays)}
+            @change=${handleDaysChange}
+            @blur=${handleDaysChange}
           />
           <span>days</span>
         </div>
       </section>
 
-      <section class="suppress-modal__section">
+      <section class="suppress-modal__section suppress-modal__section--suppress">
         <h3 class="suppress-modal__section-title">Suppress from Autocomplete</h3>
         <p class="suppress-modal__description">Checked names will not appear in autocomplete suggestions.</p>
+        ${allNames.length > 6 ? html`
+          <input
+            class="suppress-modal__filter"
+            type="search"
+            placeholder="Filter names..."
+            .value=${filterValue}
+            @input=${handleFilterInput}
+          />
+        ` : ''}
         <ul class="suppress-modal__list">
           ${allNames.map(name => html`
-            <li class="suppress-modal__item">
+            <li class="suppress-modal__item" data-name=${name}>
               <label class="suppress-modal__label">
                 <input
                   type="checkbox"
                   class="suppress-modal__checkbox"
                   value=${name}
                   ?checked=${suppressedNames.has(name)}
+                  @change=${() => onToggleSuppress(name)}
                 />
                 ${name}
               </label>
@@ -79,8 +112,7 @@ export function SettingsModal({ allNames, suppressedNames, holdReviewDays, onSav
       </section>
 
       <div class="suppress-modal__controls">
-        <button class="button-ok" @click=${handleSave}>Save</button>
-        <button class="button-cancel" @click=${onClose}>Cancel</button>
+        <button class="button-ok" @click=${onClose}>Close</button>
       </div>
     </dialog>
   `;

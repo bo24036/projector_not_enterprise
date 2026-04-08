@@ -97,16 +97,16 @@ registerHandler('UPDATE_HOLD_REVIEW_DAYS', (state, action) => {
   return { state: { ...state } };
 });
 
-registerHandler('UPDATE_SUPPRESSED_NAMES', (state, action) => {
+registerHandler('TOGGLE_SUPPRESSED_NAME', (state, action) => {
   try {
-    Person.setSuppressedNames(action.payload.names);
-    return { state: { ...state, showSettingsModal: false } };
+    Person.toggleSuppressedName(action.payload.name);
+    return { state: { ...state } };
   } catch (error) {
     return {
       state: {
         ...state,
         lastError: {
-          actionType: 'UPDATE_SUPPRESSED_NAMES',
+          actionType: 'TOGGLE_SUPPRESSED_NAME',
           message: error.message,
           timestamp: Date.now(),
         },

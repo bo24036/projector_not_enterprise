@@ -271,6 +271,16 @@ export function setSuppressedNames(namesArray) {
   settingSerialize({ id: 'suppressed-names', value: namesArray || [] }, 'put');
 }
 
+export function toggleSuppressedName(name) {
+  if (suppressedNamesCache.has(name)) {
+    suppressedNamesCache.delete(name);
+  } else {
+    suppressedNamesCache.add(name);
+  }
+  const namesArray = [...suppressedNamesCache];
+  settingSerialize({ id: 'suppressed-names', value: namesArray }, 'put');
+}
+
 export function getAllUniquePersonNamesRaw() {
   const allPeople = Array.from(personCache.values());
   return [...new Set(allPeople.map(p => p.name).filter(n => n && n.trim()))];

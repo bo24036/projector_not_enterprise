@@ -1310,12 +1310,24 @@
   color: var(--color-text-secondary);
 }
 
+.suppress-modal__filter {
+  width: 100%;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  margin-bottom: var(--spacing-xs);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  background-color: var(--color-background);
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  box-sizing: border-box;
+}
+
 .suppress-modal__list {
   list-style: none;
   padding: 0;
   margin: 0;
   overflow-y: auto;
-  flex: 1;
+  max-height: 180px;
   border: var(--border-width) solid var(--color-border);
   border-radius: var(--border-radius-sm);
   background-color: var(--color-background);

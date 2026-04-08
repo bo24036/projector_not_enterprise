@@ -130,12 +130,9 @@ export function initSidebarConnector(containerSelector, state) {
           allNames,
           suppressedNames,
           holdReviewDays,
-          onSave: (names, days) => {
-            dispatch({ type: 'UPDATE_SUPPRESSED_NAMES', payload: { names } });
-            dispatch({ type: 'UPDATE_HOLD_REVIEW_DAYS', payload: { days } });
-            dispatch({ type: 'CLOSE_SETTINGS_MODAL' });
-          },
           onClose: () => dispatch({ type: 'CLOSE_SETTINGS_MODAL' }),
+          onToggleSuppress: (name) => dispatch({ type: 'TOGGLE_SUPPRESSED_NAME', payload: { name } }),
+          onHoldReviewDaysChange: (days) => dispatch({ type: 'UPDATE_HOLD_REVIEW_DAYS', payload: { days } }),
           onExport: () => dispatch({ type: 'EXPORT_DATA' }),
           onImport: (file) => dispatch({ type: 'IMPORT_DATA', payload: { file } }),
           backupDirName: getDirName(),
