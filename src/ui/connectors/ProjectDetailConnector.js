@@ -1,4 +1,5 @@
 import { html, render } from '/vendor/lit-html/lit-html.js';
+import { keyed } from '/vendor/lit-html/directives/keyed.js';
 import { focusAutofocusElement } from '../../utils/domHelpers.js';
 import { ProjectDetail } from '../components/ProjectDetail.js';
 import { RestoreProjectModal } from '../components/RestoreProjectModal.js';
@@ -12,8 +13,6 @@ import * as Settings from '../../domains/Settings.js';
 import { dispatch } from '../../state.js';
 import { navigateToOverview } from '../../utils/router.js';
 
-let lastTaskFormKey = null;
-let lastPersonFormKey = null;
 
 export function initProjectDetailConnector(containerSelector, state) {
   const container = document.querySelector(containerSelector);
@@ -40,7 +39,7 @@ export function initProjectDetailConnector(containerSelector, state) {
 
   const people = Person.getPeopleByProjectId(project.id) || [];
   const { names: allNames, roles: allRoles } = Person.getAllPeopleForAutocomplete();
-  const { creatingPerson, editingPersonId } = state;
+  const { creatingPerson, editingPersonId, personFormKey } = state;
   const editingPerson = editingPersonId ? Person.getPerson(editingPersonId) : null;
 
   const template = html`
@@ -116,14 +115,14 @@ export function initProjectDetailConnector(containerSelector, state) {
                   [Click to add person...]
                 </button>
               </div>`
-            : PersonInput({
+            : keyed(personFormKey, PersonInput({
                 nameOptions: allNames,
                 roleOptions: allRoles,
                 onSave: (name, role) => {
                   dispatch({ type: 'CREATE_PERSON', payload: { projectId: project.id, name, role } });
                 },
                 onCancel: () => dispatch({ type: 'CANCEL_CREATE_PERSON' }),
-              })
+              }))
           ) : ''}
         </div>
       </div>
@@ -143,18 +142,7 @@ export function initProjectDetailConnector(containerSelector, state) {
       if (dialog && !dialog.open) dialog.showModal();
     }
 
-    // When an item is saved and the form stays open, *FormKey increments.
-    // Clear all inputs and force-focus the primary field for the fresh form.
-    if (state.creatingTask && state.taskFormKey !== lastTaskFormKey) {
-      lastTaskFormKey = state.taskFormKey;
-      container.querySelectorAll('.task-list-item--creating input').forEach(el => { el.value = ''; });
-      container.querySelector('.task-input__field--name')?.focus();
-    }
-    if (state.creatingPerson && state.personFormKey !== lastPersonFormKey) {
-      lastPersonFormKey = state.personFormKey;
-      container.querySelectorAll('.person-list-item--creating input').forEach(el => { el.value = ''; });
-      container.querySelector('.person-input__field--name')?.focus();
-    }
+
   });
 
   focusAutofocusElement(container);

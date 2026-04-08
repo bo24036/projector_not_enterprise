@@ -1,4 +1,5 @@
 import { html } from '/vendor/lit-html/lit-html.js';
+import { keyed } from '/vendor/lit-html/directives/keyed.js';
 import { TaskListItem } from '../components/TaskListItem.js';
 import { TaskInput } from '../components/TaskInput.js';
 import * as Task from '../../domains/Task.js';
@@ -10,7 +11,7 @@ export function TaskListConnector({ projectId, state }) {
   const tasks = Task.getTasksByProjectId(projectId);
   const project = Project.getProject(projectId);
   const isArchived = project?.archived ?? false;
-  const { creatingTask, editingTaskId } = state;
+  const { creatingTask, editingTaskId, taskFormKey } = state;
   const editingTask = editingTaskId ? Task.getTask(editingTaskId) : null;
 
   return html`
@@ -50,7 +51,7 @@ export function TaskListConnector({ projectId, state }) {
           `
         : ''}
 
-      ${!isArchived ? (creatingTask ? TaskInput({
+      ${!isArchived ? (creatingTask ? keyed(taskFormKey, TaskInput({
         onSave: (name, dueDate) => {
           dispatch({
             type: 'CREATE_TASK',
@@ -60,7 +61,7 @@ export function TaskListConnector({ projectId, state }) {
         onCancel: () => {
           dispatch({ type: 'CANCEL_CREATE_TASK' });
         },
-      }) : html`
+      })) : html`
             <div class="task-list-item task-list-item--placeholder">
               <button
                 class="task-list-item__placeholder-button"

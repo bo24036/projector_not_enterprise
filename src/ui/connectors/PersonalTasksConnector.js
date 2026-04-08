@@ -1,4 +1,5 @@
 import { html, render } from '/vendor/lit-html/lit-html.js';
+import { keyed } from '/vendor/lit-html/directives/keyed.js';
 import { focusAutofocusElement } from '../../utils/domHelpers.js';
 import { TaskListItem } from '../components/TaskListItem.js';
 import { TaskInput } from '../components/TaskInput.js';
@@ -6,14 +7,12 @@ import * as Task from '../../domains/Task.js';
 import { dispatch } from '../../state.js';
 import { makeTaskDisplayObject } from '../../utils/taskFormatting.js';
 
-let lastTaskFormKey = null;
-
 export function initPersonalTasksConnector(containerSelector, state) {
   const container = document.querySelector(containerSelector);
   if (!container) return;
 
   const tasks = Task.getPersonalTasks();
-  const { creatingTask, editingTaskId } = state;
+  const { creatingTask, editingTaskId, taskFormKey } = state;
   const editingTask = editingTaskId ? Task.getTask(editingTaskId) : null;
 
   const template = html`
@@ -61,7 +60,7 @@ export function initPersonalTasksConnector(containerSelector, state) {
               [Click to add task...]
             </button>
           </div>
-        ` : TaskInput({
+        ` : keyed(taskFormKey, TaskInput({
           onSave: (name, dueDate) => {
             dispatch({
               type: 'CREATE_TASK',
@@ -71,20 +70,12 @@ export function initPersonalTasksConnector(containerSelector, state) {
           onCancel: () => {
             dispatch({ type: 'CANCEL_CREATE_TASK' });
           },
-        })}
+        }))}
       </div>
     </div>
   `;
 
   render(template, container);
-
-  requestAnimationFrame(() => {
-    if (state.creatingTask && state.taskFormKey !== lastTaskFormKey) {
-      lastTaskFormKey = state.taskFormKey;
-      container.querySelectorAll('.task-list-item--creating input').forEach(el => { el.value = ''; });
-      container.querySelector('.task-input__field--name')?.focus();
-    }
-  });
 
   focusAutofocusElement(container);
 }
