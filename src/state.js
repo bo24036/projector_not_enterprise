@@ -23,6 +23,7 @@ const state = {
   showReadingListRead: false,
   readingListSearch: '',
   showSettingsModal: false,
+  showDataModal: false,
   restoringProjectId: null,
   lastError: null, // { actionType, message, entityId, timestamp } - cleared when dismissed or on next action
   updateAvailable: false,

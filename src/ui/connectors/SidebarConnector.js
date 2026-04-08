@@ -4,6 +4,7 @@ import { ProjectListItem } from '../components/ProjectListItem.js';
 import { ProjectNewItem } from '../components/ProjectNewItem.js';
 import { ProjectInput } from '../components/ProjectInput.js';
 import { SettingsModal } from '../components/SuppressNamesModal.js';
+import { DataModal } from '../components/DataModal.js';
 import * as Project from '../../domains/Project.js';
 import * as Task from '../../domains/Task.js';
 import * as Person from '../../domains/Person.js';
@@ -122,6 +123,10 @@ export function initSidebarConnector(containerSelector, state) {
           @click=${() => dispatch({ type: 'OPEN_SETTINGS_MODAL' })}>
           Settings…
         </button>
+        <button class="sidebar__data-btn"
+          @click=${() => dispatch({ type: 'OPEN_DATA_MODAL' })}>
+          Data…
+        </button>
       </div>
     </div>
 
@@ -133,6 +138,12 @@ export function initSidebarConnector(containerSelector, state) {
           onClose: () => dispatch({ type: 'CLOSE_SETTINGS_MODAL' }),
           onToggleSuppress: (name) => dispatch({ type: 'TOGGLE_SUPPRESSED_NAME', payload: { name } }),
           onHoldReviewDaysChange: (days) => dispatch({ type: 'UPDATE_HOLD_REVIEW_DAYS', payload: { days } }),
+        })
+      : ''
+    }
+    ${state.showDataModal
+      ? DataModal({
+          onClose: () => dispatch({ type: 'CLOSE_DATA_MODAL' }),
           onExport: () => dispatch({ type: 'EXPORT_DATA' }),
           onImport: (file) => dispatch({ type: 'IMPORT_DATA', payload: { file } }),
           backupDirName: getDirName(),
@@ -150,9 +161,11 @@ export function initSidebarConnector(containerSelector, state) {
   requestAnimationFrame(() => {
     if (state.showSettingsModal) {
       const dialog = container.querySelector('.suppress-modal');
-      if (dialog && !dialog.open) {
-        dialog.showModal();
-      }
+      if (dialog && !dialog.open) dialog.showModal();
+    }
+    if (state.showDataModal) {
+      const dialog = container.querySelector('.data-modal');
+      if (dialog && !dialog.open) dialog.showModal();
     }
   });
 

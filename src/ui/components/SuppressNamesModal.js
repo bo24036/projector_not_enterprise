@@ -7,10 +7,6 @@ export function SettingsModal({
   onClose,
   onToggleSuppress,
   onHoldReviewDaysChange,
-  onExport,
-  onImport,
-  backupDirName,
-  onSetBackupDir,
 }) {
   let filterValue = '';
 
@@ -77,38 +73,6 @@ export function SettingsModal({
             </li>
           `)}
         </ul>
-      </section>
-
-      <section class="suppress-modal__section">
-        <h3 class="suppress-modal__section-title">Data</h3>
-        <p class="suppress-modal__description">Export a backup of all your data, or import a previously exported file.</p>
-        <div class="suppress-modal__data-actions">
-          <button class="suppress-modal__data-btn" @click=${onExport}>Export</button>
-          <label class="suppress-modal__data-btn suppress-modal__import-label">
-            Import
-            <input
-              type="file"
-              accept=".json"
-              class="suppress-modal__import-input"
-              @change=${(e) => {
-                const file = e.target.files[0];
-                if (file) onImport(file);
-                e.target.value = '';
-              }}
-            />
-          </label>
-        </div>
-        <div class="suppress-modal__backup-row">
-          <div class="suppress-modal__backup-status">
-            <span class="suppress-modal__backup-label">Auto-backup folder</span>
-            <span class="suppress-modal__backup-dir">
-              ${backupDirName ? `"${backupDirName}" (browser security limits display to folder name only)` : 'No folder set — changes will not be backed up automatically'}
-            </span>
-          </div>
-          <button class="suppress-modal__data-btn" @click=${onSetBackupDir}>
-            ${backupDirName ? 'Change' : 'Set folder'}
-          </button>
-        </div>
       </section>
 
       <div class="suppress-modal__controls">

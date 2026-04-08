@@ -3,6 +3,9 @@ import { exportData, importData, setBackupDirEffect } from '../effects/DataTrans
 import { scheduleVersionCheck } from '../utils/versionCheck.js';
 import { createNoOpLoadedHandler } from '../utils/handlerFactory.js';
 
+registerHandler('OPEN_DATA_MODAL', (state) => ({ state: { ...state, showDataModal: true } }));
+registerHandler('CLOSE_DATA_MODAL', (state) => ({ state: { ...state, showDataModal: false } }));
+
 registerHandler('EXPORT_DATA', (state) => {
   return { state, effects: [exportData] };
 });
