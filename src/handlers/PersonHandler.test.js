@@ -30,9 +30,10 @@ const BASE_STATE = {
   editingTaskId: null,
   creatingPerson: false,
   editingPersonId: null,
+  personFormKey: 0,
   creatingNote: false,
   editingNoteId: null,
-  showSuppressNamesModal: false,
+  showSettingsModal: false,
   lastError: null,
 };
 
@@ -42,8 +43,9 @@ Person._resetCacheForTesting();
 
 const createPerson = _getHandlerForTesting('CREATE_PERSON');
 
-const createResult = createPerson({ ...BASE_STATE, creatingPerson: true }, { type: 'CREATE_PERSON', payload: { projectId: 'proj_1', name: 'Alice', role: 'PM' } });
-assertEqual(createResult.state.creatingPerson, false, 'CREATE_PERSON: resets creatingPerson on success');
+const createResult = createPerson({ ...BASE_STATE, creatingPerson: true, personFormKey: 0 }, { type: 'CREATE_PERSON', payload: { projectId: 'proj_1', name: 'Alice', role: 'PM' } });
+assertEqual(createResult.state.creatingPerson, true, 'CREATE_PERSON: keeps creatingPerson true on success (form stays open)');
+assertEqual(createResult.state.personFormKey, 1, 'CREATE_PERSON: increments personFormKey on success');
 assertEqual(createResult.state.lastError, null, 'CREATE_PERSON: no error on success');
 assert(Person.getPeopleByProjectId('proj_1').length === 1, 'CREATE_PERSON: person in domain cache');
 
@@ -105,13 +107,13 @@ assertEqual(cancelEditResult.state.editingPersonId, null, 'CANCEL_EDIT_PERSON: c
 const startEditMissResult = startEdit(BASE_STATE, { type: 'START_EDIT_PERSON', payload: { personId: 'nonexistent' } });
 assertEqual(startEditMissResult.state.editingPersonId, null, 'START_EDIT_PERSON: no-op for unknown person');
 
-// --- OPEN/CLOSE_SUPPRESS_NAMES_MODAL ---
-console.log('\n=== SUPPRESS_NAMES_MODAL ===');
+// --- OPEN/CLOSE_SETTINGS_MODAL ---
+console.log('\n=== SETTINGS_MODAL ===');
 
-const openModal = _getHandlerForTesting('OPEN_SUPPRESS_NAMES_MODAL');
-const closeModal = _getHandlerForTesting('CLOSE_SUPPRESS_NAMES_MODAL');
-assertEqual(openModal(BASE_STATE).state.showSuppressNamesModal, true, 'OPEN_SUPPRESS_NAMES_MODAL: sets showSuppressNamesModal to true');
-assertEqual(closeModal({ ...BASE_STATE, showSuppressNamesModal: true }).state.showSuppressNamesModal, false, 'CLOSE_SUPPRESS_NAMES_MODAL: sets showSuppressNamesModal to false');
+const openModal = _getHandlerForTesting('OPEN_SETTINGS_MODAL');
+const closeModal = _getHandlerForTesting('CLOSE_SETTINGS_MODAL');
+assertEqual(openModal(BASE_STATE).state.showSettingsModal, true, 'OPEN_SETTINGS_MODAL: sets showSettingsModal to true');
+assertEqual(closeModal({ ...BASE_STATE, showSettingsModal: true }).state.showSettingsModal, false, 'CLOSE_SETTINGS_MODAL: sets showSettingsModal to false');
 
 // --- Summary ---
 console.log(`\n=== Summary ===`);

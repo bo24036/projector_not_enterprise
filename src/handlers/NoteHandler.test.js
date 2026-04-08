@@ -32,7 +32,8 @@ const BASE_STATE = {
   editingPersonId: null,
   creatingNote: false,
   editingNoteId: null,
-  showSuppressNamesModal: false,
+  noteFormKey: 0,
+  showSettingsModal: false,
   lastError: null,
 };
 
@@ -42,8 +43,9 @@ Note._resetCacheForTesting();
 
 const createNote = _getHandlerForTesting('CREATE_NOTE');
 
-const createResult = createNote({ ...BASE_STATE, creatingNote: true }, { type: 'CREATE_NOTE', payload: { projectId: 'proj_1', content: 'First note', link: '' } });
-assertEqual(createResult.state.creatingNote, false, 'CREATE_NOTE: resets creatingNote on success');
+const createResult = createNote({ ...BASE_STATE, creatingNote: true, noteFormKey: 0 }, { type: 'CREATE_NOTE', payload: { projectId: 'proj_1', content: 'First note', link: '' } });
+assertEqual(createResult.state.creatingNote, true, 'CREATE_NOTE: keeps creatingNote true on success (form stays open)');
+assertEqual(createResult.state.noteFormKey, 1, 'CREATE_NOTE: increments noteFormKey on success');
 assertEqual(createResult.state.lastError, null, 'CREATE_NOTE: no error on success');
 assert(Note.getNotesByProjectId('proj_1').length === 1, 'CREATE_NOTE: note added to domain cache');
 

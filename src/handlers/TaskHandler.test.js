@@ -29,11 +29,12 @@ const BASE_STATE = {
   showArchivedProjects: false,
   creatingTask: false,
   editingTaskId: null,
+  taskFormKey: 0,
   creatingPerson: false,
   editingPersonId: null,
   creatingNote: false,
   editingNoteId: null,
-  showSuppressNamesModal: false,
+  showSettingsModal: false,
   lastError: null,
 };
 
@@ -44,7 +45,8 @@ Task._resetCacheForTesting();
 const createTask = _getHandlerForTesting('CREATE_TASK');
 
 const createResult = createTask(BASE_STATE, { type: 'CREATE_TASK', payload: { projectId: 'proj_1', name: 'New Task', dueDate: null } });
-assertEqual(createResult.state.creatingTask, false, 'CREATE_TASK: resets creatingTask to false on success');
+assertEqual(createResult.state.creatingTask, true, 'CREATE_TASK: keeps creatingTask true on success (form stays open)');
+assertEqual(createResult.state.taskFormKey, 1, 'CREATE_TASK: increments taskFormKey on success');
 assertEqual(createResult.state.lastError, null, 'CREATE_TASK: no error on success');
 assert(Task.getTasksByProjectId('proj_1').length === 1, 'CREATE_TASK: task added to domain cache');
 
