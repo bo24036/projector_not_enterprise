@@ -35,7 +35,8 @@ export function initProjectDetailConnector(containerSelector, state) {
   const createdAtFormatted = formatDate(project.createdAt);
   const archivedAtFormatted = formatDate(project.archivedAt);
   const holdReviewDays = Settings.getHoldReviewDays();
-  const isReviewDue = isHeld && (Date.now() - project.heldAt > holdReviewDays * 86400000);
+  const MS_PER_DAY = 86400000;
+  const isReviewDue = isHeld && (Date.now() - project.heldAt > holdReviewDays * MS_PER_DAY);
 
   const people = Person.getPeopleByProjectId(project.id) || [];
   const { names: allNames, roles: allRoles } = Person.getAllPeopleForAutocomplete();

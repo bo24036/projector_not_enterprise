@@ -28,6 +28,10 @@ const projectIdIndex = new Map(); // Map of projectId -> Set of taskIds
 
 const ERROR_TASK_NOT_FOUND = 'Task not found';
 
+const SUNDAY = 0;
+const SATURDAY = 6;
+const MONTH_INDEX_OFFSET = 1; // JS Date months are 0-based; user input is 1-based
+
 // Get today's date normalized to midnight (no time component)
 function getNormalizedToday() {
   const now = new Date();
@@ -51,8 +55,7 @@ function addBusinessDays(startDate, businessDays) {
   while (count < businessDays) {
     date.setDate(date.getDate() + 1);
     const dayOfWeek = date.getDay();
-    // Skip weekends (0 = Sunday, 6 = Saturday)
-    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+    if (dayOfWeek !== SUNDAY && dayOfWeek !== SATURDAY) {
       count++;
     }
   }
@@ -96,7 +99,7 @@ function parseDueDate(input) {
     // YYYY-MM-DD (but not negative numbers)
     const [year, month, day] = trimmed.split('-').map(Number);
     if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
-      date = new Date(year, month - 1, day);
+      date = new Date(year, month - MONTH_INDEX_OFFSET, day);
       return date.getTime();
     }
   } else if (trimmed.includes('/')) {
@@ -105,11 +108,11 @@ function parseDueDate(input) {
     if (parts.length === 2) {
       const [month, day] = parts;
       const year = now.getFullYear();
-      date = new Date(year, month - 1, day);
+      date = new Date(year, month - MONTH_INDEX_OFFSET, day);
       return date.getTime();
     } else if (parts.length === 3) {
       const [month, day, year] = parts;
-      date = new Date(year, month - 1, day);
+      date = new Date(year, month - MONTH_INDEX_OFFSET, day);
       return date.getTime();
     }
   }
